@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:somsakpharma/models/product_all_model.dart';
@@ -8,6 +9,8 @@ import 'package:somsakpharma/models/promote_model.dart';
 import 'package:somsakpharma/models/user_model.dart';
 import 'package:somsakpharma/scaffold/authen.dart';
 import 'package:somsakpharma/scaffold/detail.dart';
+import 'package:somsakpharma/scaffold/detail_cart.dart';
+
 import 'package:somsakpharma/scaffold/list_product.dart';
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
@@ -33,7 +36,7 @@ class _HomeState extends State<Home> {
   UserModel myUserModel;
   List<ProductAllModel> promoteModels = List();
   List<ProductAllModel> suggestModels = List();
-
+  String qrString;
   // Method
   @override
   void initState() {
@@ -107,6 +110,8 @@ class _HomeState extends State<Home> {
         // Navigator.of(context).push(route).then((value) {});  //  link to detail page
       },
       child: CarouselSlider(
+        height: 1200,
+        viewportFraction: 0.8,
         enlargeCenterPage: true,
         aspectRatio: 16 / 9,
         pauseAutoPlayOnTouch: Duration(seconds: 5),
@@ -150,21 +155,27 @@ class _HomeState extends State<Home> {
   }
 
   Widget promotion() {
-    return Container(
-      padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-      height: MediaQuery.of(context).size.width * 0.70,  // size.height * 0.20,
-      child:
-          promoteLists.length == 0 ? myCircularProgress() : showCarouseSlider(),
+    return Card(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+        height: MediaQuery.of(context).size.width * 0.70, // size.height * 0.20,
+        child: promoteLists.length == 0
+            ? myCircularProgress()
+            : showCarouseSlider(),
+      ),
     );
   }
 
   Widget suggest() {
-    return Container(
-      // color: Colors.grey.shade400,
-      height: MediaQuery.of(context).size.height * 0.20,
-      child: suggestLists.length == 0
-          ? myCircularProgress()
-          : showCarouseSliderSuggest(),
+    return Card(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.25,
+        child: suggestLists.length == 0
+            ? myCircularProgress()
+            : showCarouseSliderSuggest(),
+      ),
     );
   }
 
@@ -186,7 +197,7 @@ class _HomeState extends State<Home> {
       // height: 80.0,
       child: GestureDetector(
         child: Card(
-          color: Colors.greenAccent.shade100,  // Colors.grey.shade100,
+          color: Colors.greenAccent.shade100, // Colors.grey.shade100,
           child: Container(
             padding: EdgeInsets.all(16.0),
             alignment: AlignmentDirectional(0.0, 0.0),
@@ -255,7 +266,7 @@ class _HomeState extends State<Home> {
 
   Widget topLeft() {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.4,
+      width: MediaQuery.of(context).size.width * 0.45,
       // height: 80.0,
       child: GestureDetector(
         child: Card(
@@ -267,10 +278,10 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_promotion.png'),
+                  child: Image.asset('images/icon_drugs.png'),
                 ),
                 Text(
-                  'Promotion',
+                  'รายการสินค้า',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -290,7 +301,7 @@ class _HomeState extends State<Home> {
 
   Widget topRight() {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.4,
+      width: MediaQuery.of(context).size.width * 0.45,
       // height: 80.0,
       child: GestureDetector(
         child: Card(
@@ -302,10 +313,10 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_new.png'),
+                  child: Image.asset('images/icon_cart.png'),
                 ),
                 Text(
-                  'New item',
+                  'ตะกร้าสินค้า',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -317,7 +328,13 @@ class _HomeState extends State<Home> {
         ),
         onTap: () {
           print('You click newproduct');
-          routeToListProduct(1);
+          MaterialPageRoute materialPageRoute =
+              MaterialPageRoute(builder: (BuildContext buildContext) {
+            return DetailCart(
+              userModel: myUserModel,
+            );
+          });
+          Navigator.of(context).push(materialPageRoute);
         },
       ),
     );
@@ -325,7 +342,7 @@ class _HomeState extends State<Home> {
 
   Widget bottomLeft() {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.4,
+      width: MediaQuery.of(context).size.width * 0.45,
       // height: 80.0,
       child: GestureDetector(
         child: Card(
@@ -337,10 +354,10 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_updateprice.png'),
+                  child: Image.asset('images/icon_barcode.png'),
                 ),
                 Text(
-                  'Update price',
+                  'Barcode scan',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -351,8 +368,9 @@ class _HomeState extends State<Home> {
           ),
         ),
         onTap: () {
-          print('You click updateprice');
-          routeToListProduct(2);
+          print('You click barcode scan');
+          readQRcode();
+         // Navigator.of(context).pop();
         },
       ),
     );
@@ -424,7 +442,7 @@ class _HomeState extends State<Home> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         bottomLeft(),
-        bottomRight(),
+        // bottomRight(),
       ],
     );
   }
@@ -448,8 +466,69 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget menuReadQRcode() {
+    return ListTile(
+      leading: Icon(
+        Icons.photo_camera,
+        size: 36.0,
+      ),
+      title: Text('Read QR code'),
+      subtitle: Text('Read QR code or barcode'),
+      onTap: () {
+        readQRcode();
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
+  Future<void> readQRcode() async {
+    try {
+      qrString = await BarcodeScanner.scan();
+      print('QR code = $qrString');
+      if (qrString != null) {
+        decodeQRcode(qrString);
+      }
+    } catch (e) {
+      print('e = $e');
+    }
+  }
+
+  Future<void> decodeQRcode(String code) async {
+    try {
+      String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
+      http.Response response = await http.get(url);
+      var result = json.decode(response.body);
+      print('result ===*******>>>> $result');
+
+      int status = result['status'];
+      print('status ===>>> $status');
+      if (status == 0) {
+        normalDialog(context, 'Not found', 'ไม่พบ code :: $code ในระบบ');
+      } else {
+        var itemProducts = result['itemsProduct'];
+        for (var map in itemProducts) {
+          print('map ===*******>>>> $map');
+
+          ProductAllModel productAllModel = ProductAllModel.fromJson(map);
+          MaterialPageRoute route = MaterialPageRoute(
+            builder: (BuildContext context) => Detail(
+              userModel: myUserModel,
+              productAllModel: productAllModel,
+            ),
+          );
+          Navigator.of(context).push(route).then((value) {
+            setState(() {
+              // readCart();
+            });
+          });
+        }
+      }
+    } catch (e) {}
+  }
+
   Widget homeMenu() {
     return Container(
+      width: MediaQuery.of(context).size.width * 0.9,
       margin: EdgeInsets.only(top: 5.0),
       alignment: Alignment(0.0, 0.0),
       // color: Colors.green.shade50,
@@ -473,11 +552,11 @@ class _HomeState extends State<Home> {
           headTitle('สินค้าแนะนำ', Icons.thumb_up),
           suggest(),
           headTitle('เมนู', Icons.home),
-          productBox(),
-          orderhistoryBox(),
-          // headTitle('สินค้าโปรโมชัน', Icons.bookmark),
+          homeMenu(),
+          // productBox(),
+          // orderhistoryBox(),
+          headTitle('สินค้าโปรโมชัน', Icons.bookmark),
           promotion(),
-          // homeMenu(),
         ],
       ),
     );

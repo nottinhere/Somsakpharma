@@ -47,7 +47,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
         applicationId "com.somsakpharma.somsakpharma"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 5
+        versionCode 7
         versionName '1.1.2'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

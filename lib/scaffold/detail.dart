@@ -26,7 +26,7 @@ class _DetailState extends State<Detail> {
   ProductAllModel2 productAllModel;
   List<UnitSizeModel> unitSizeModels = List();
   List<int> amounts = [
-    0,
+    1,
     0,
     0
   ]; // amount[0] -> s,amount[1] -> m,amount[2] -> l;
@@ -213,6 +213,7 @@ class _DetailState extends State<Detail> {
         amontCart++;
       });
     }
+    print('amontCart (detail page)=====>>>>>>>> $amontCart');
   }
 
   Widget showCart() {
@@ -343,18 +344,24 @@ class _DetailState extends State<Detail> {
 
     http.Response response = await http.get(url).then((response) {
       print('upload ok');
-      readCart();
       MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext buildContext){return DetailCart(userModel: myUserModel,);});
-      Navigator.of(context).push(materialPageRoute);
+      // Navigator.of(context).push(materialPageRoute);
+      readCart();
+
+
+
+      Navigator.pop(context,true);
     });
   }
 
   Widget showDetailList() {
-    return Stack(
-      children: <Widget>[
-        showController(),
-        addButton(),
-      ],
+    return Card(
+          child: Stack(
+        children: <Widget>[
+          showController(),
+          addButton(),
+        ],
+      ),
     );
   }
 
