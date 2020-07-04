@@ -310,7 +310,9 @@ class _DetailCartState extends State<DetailCart> {
     print('url editDetailCart ====>>>>> $url');
 
     await http.get(url).then((response) {
-      readCart();
+      setState(() {
+        readCart();      
+      });
     });
   }
 
@@ -371,7 +373,9 @@ class _DetailCartState extends State<DetailCart> {
     print('url DeleteCart#######################======>>>> $url');
 
     await http.get(url).then((response) {
-      readCart();
+      setState(() {
+        readCart();      
+      });
     });
   }
 
@@ -641,8 +645,8 @@ class _DetailCartState extends State<DetailCart> {
 
   BottomNavigationBarItem readQrBotton() {
     return BottomNavigationBarItem(
-      icon: Icon(Icons.code),
-      title: Text('QR code'),
+      icon: Icon(Icons.camera_alt),
+      title: Text('Barcode Scan'),
     );
   }
 
@@ -706,11 +710,12 @@ class _DetailCartState extends State<DetailCart> {
               productAllModel: productAllModel,
             ),
           );
-          Navigator.of(context).push(route).then((value) {
-            setState(() {
-              readCart();
-            });
-          });
+          // Navigator.of(context).push(route).then((value) {
+          //   setState(() {
+          //     readCart();
+          //   });
+          // });
+            Navigator.of(context).push(route).then((value)=>readCart());    
         }
       }
     } catch (e) {}

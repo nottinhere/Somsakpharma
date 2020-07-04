@@ -344,12 +344,7 @@ class _DetailState extends State<Detail> {
 
     http.Response response = await http.get(url).then((response) {
       print('upload ok');
-      MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext buildContext){return DetailCart(userModel: myUserModel,);});
-      // Navigator.of(context).push(materialPageRoute);
-      readCart();
-
-
-
+      // MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext buildContext){return DetailCart(userModel: myUserModel,);});
       Navigator.pop(context,true);
     });
   }

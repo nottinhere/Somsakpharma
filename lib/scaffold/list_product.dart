@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:http/http.dart' as http;
 import 'package:somsakpharma/models/product_all_model.dart';
 import 'package:somsakpharma/models/user_model.dart';
 import 'package:somsakpharma/utility/my_style.dart';
-
+import 'package:somsakpharma/utility/normal_dialog.dart';
 import 'detail.dart';
 import 'detail_cart.dart';
 
@@ -46,7 +47,7 @@ class _ListProductState extends State<ListProduct> {
   int amontCart = 0;
   UserModel myUserModel;
   String searchString = '';
-
+  String qrString;
   int amountListView = 6, page = 1;
   ScrollController scrollController = ScrollController();
   final Debouncer debouncer =
@@ -66,7 +67,6 @@ class _ListProductState extends State<ListProduct> {
     setState(() {
       readData(); // read  ข้อมูลมาแสดง
       readCart();
-      
     });
   }
 
@@ -91,8 +91,8 @@ class _ListProductState extends State<ListProduct> {
 
 /************************************** */
   Future<void> readCart() async {
+    amontCart = 0;
     String memberId = myUserModel.id.toString();
-    print(memberId);
     String url =
         'http://somsakpharma.com/api/json_loadmycart.php?memberId=$memberId';
 
@@ -105,9 +105,6 @@ class _ListProductState extends State<ListProduct> {
         amontCart++;
       });
     }
-      // setState(() {
-      //   amontCart;
-      // });
     print('TotalItemInCart (read)>>$amontCart');
   }
 
@@ -189,6 +186,44 @@ class _ListProductState extends State<ListProduct> {
   }
 
   Widget showStock(int index) {
+    if (filterProductAllModels[index].stock == 0) {
+      return Row(
+        children: <Widget>[
+          Text(
+            'Stock : ',
+            style: MyStyle().h3Style,
+          ),
+          Text(
+            '${filterProductAllModels[index].stock.toString()}',
+            style: TextStyle(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.normal,
+                fontSize: 16.00),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: <Widget>[
+          Text(
+            'Stock : ',
+            style: MyStyle().h3Style,
+          ),
+          Text(
+            '${filterProductAllModels[index].stock.toString()}',
+            style: TextStyle(
+                color: Colors.blue.shade900,
+                fontWeight: FontWeight.normal,
+                fontSize: 16.00),
+          ),
+        ],
+      );
+    }
+
+    // return Text('na');
+  }
+
+  Widget showPrice(int index) {
     return Row(
       children: <Widget>[
         Text(
@@ -209,7 +244,11 @@ class _ListProductState extends State<ListProduct> {
         padding: EdgeInsets.only(bottom: 5.0, top: 5.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[showName(index), showStock(index)],
+          children: <Widget>[
+            showName(index),
+            showStock(index),
+            showPrice(index)
+          ],
         ),
       ),
     );
@@ -265,7 +304,9 @@ class _ListProductState extends State<ListProduct> {
                   userModel: myUserModel,
                 );
               });
-              Navigator.of(context).push(materialPageRoute);
+              Navigator.of(context)
+                  .push(materialPageRoute)
+                  .then((value) => readCart());
             },
           );
         },
@@ -363,7 +404,46 @@ class _ListProductState extends State<ListProduct> {
     );
   }
 
+  Future<void> readQRcode() async {
+    try {
+      qrString = await BarcodeScanner.scan();
+      print('QR code = $qrString');
+      if (qrString != null) {
+        decodeQRcode(qrString);
+      }
+    } catch (e) {
+      print('e = $e');
+    }
+  }
 
+  Future<void> decodeQRcode(String code) async {
+    try {
+      String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
+      http.Response response = await http.get(url);
+      var result = json.decode(response.body);
+      print('result ===*******>>>> $result');
+
+      int status = result['status'];
+      print('status ===>>> $status');
+      if (status == 0) {
+        normalDialog(context, 'Not found', 'ไม่พบ code :: $code ในระบบ');
+      } else {
+        var itemProducts = result['itemsProduct'];
+        for (var map in itemProducts) {
+          print('map ===*******>>>> $map');
+
+          ProductAllModel productAllModel = ProductAllModel.fromJson(map);
+          MaterialPageRoute route = MaterialPageRoute(
+            builder: (BuildContext context) => Detail(
+              userModel: myUserModel,
+              productAllModel: productAllModel,
+            ),
+          );
+          Navigator.of(context).push(route).then((value) => readCart());
+        }
+      }
+    } catch (e) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -384,6 +464,14 @@ class _ListProductState extends State<ListProduct> {
           searchForm(),
           showContent(),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          readQRcode();
+        },
+        icon: Icon(Icons.camera_alt),
+        label: Text('Scan'),
+        backgroundColor: Colors.green,
       ),
     );
   }
