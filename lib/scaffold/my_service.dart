@@ -93,7 +93,7 @@ class _MyServiceState extends State<MyService> {
 
   Future<void> logOut() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.clear();
+    await  sharedPreferences.clear();
     exit(0);
   }
 

@@ -117,9 +117,10 @@ class _HomeState extends State<Home> {
         pauseAutoPlayOnTouch: Duration(seconds: 5),
         autoPlay: true,
         autoPlayAnimationDuration: Duration(seconds: 5),
-        items: promoteLists,
+        items: promoteLists,       
         onPageChanged: (int index) {
           banerIndex = index;
+          Text('x');
           // print('index = $index');
         },
       ),
