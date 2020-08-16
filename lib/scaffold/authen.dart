@@ -237,6 +237,21 @@ class _AuthenState extends State<Authen> {
       child: CircularProgressIndicator(),
     );
   }
+  
+
+    Widget register() {
+    return Text(
+      'สมัครสมาชิก',
+      style: TextStyle(
+        fontSize: MyStyle().h2,
+        color: MyStyle().mainColor,
+        fontWeight: FontWeight.bold,
+        fontStyle: FontStyle.normal,
+        fontFamily: MyStyle().fontName,
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -273,6 +288,8 @@ class _AuthenState extends State<Authen> {
                 rememberCheckbox(),
                 mySizeBox(),
                 loginButton(),
+                mySizeBox(),
+                register(),
               ],
             ),
           ),

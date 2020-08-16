@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;  
+import 'package:http/http.dart' as http;
 import 'package:somsakpharma/models/product_all_model.dart';
 import 'package:somsakpharma/models/product_all_model2.dart';
 import 'package:somsakpharma/models/unit_size_model.dart';
@@ -33,6 +33,10 @@ class _DetailState extends State<Detail> {
   int amontCart = 0;
   UserModel myUserModel;
   String id; // productID
+
+  String qtyS = '', qtyM = '', qtyL = '';
+  int sizeSincart = 0, sizeMincart = 0, sizeLincart = 0;
+  var showSincart = '', showMincart = '', showLincart = '';
 
   // Method
   @override
@@ -92,13 +96,19 @@ class _DetailState extends State<Detail> {
 
   Widget showImage() {
     return Container(
-      height: MediaQuery.of(context).size.height*0.5-50,
-      child: Image.network(productAllModel.photo,fit: BoxFit.contain,),
+      height: MediaQuery.of(context).size.height * 0.5 - 50,
+      child: Image.network(
+        productAllModel.photo,
+        fit: BoxFit.contain,
+      ),
     );
   }
 
   Widget showTitle() {
-    return Text(productAllModel.title,style: MyStyle().h2Style,);
+    return Text(
+      productAllModel.title,
+      style: MyStyle().h2Style,
+    );
   }
 
   Widget showDetail() {
@@ -106,11 +116,17 @@ class _DetailState extends State<Detail> {
   }
 
   Widget showPackage(int index) {
-    return Text(unitSizeModels[index].lable,style: MyStyle().h3Style,);
+    return Text(
+      unitSizeModels[index].lable,
+      style: MyStyle().h3Style,
+    );
   }
 
   Widget showPricePackage(int index) {
-    return Text('${unitSizeModels[index].price.toString()} บาท/ ',style: MyStyle().h3Style,);
+    return Text(
+      '${unitSizeModels[index].price.toString()} บาท/ ',
+      style: MyStyle().h3Style,
+    );
   }
 
   Widget showChoosePricePackage(int index) {
@@ -118,8 +134,68 @@ class _DetailState extends State<Detail> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         showDetailPrice(index),
-        incDecValue(index),
+        // incDecValue(index),
+        showValue(index),
       ],
+    );
+  }
+
+  Widget showValue(int index) {
+    // int value = amounts[index];
+    //  return Text('$value');
+    var iniValue = '';
+    bool readOnlyMode;
+    var iconName;
+    var iconColor;
+    // print('$sizeSincart / $sizeMincart / $sizeLincart ');
+    if (index == 0)
+      iniValue = showSincart.toString();
+    else if (index == 1)
+      iniValue = showMincart.toString();
+    else if (index == 2) iniValue = showLincart.toString();
+    /////////////////////////////////////////////////////////
+    if (unitSizeModels[index].price.toString() == '0') {
+      readOnlyMode = true;
+      iconName = Icons.cancel;
+      iconColor = Color.fromARGB(0xff, 0xff, 0x99, 0x99);
+    } else {
+      readOnlyMode = false;
+      iconName = Icons.mode_edit;
+      iconColor = Colors.grey;
+    }
+
+    return Container(
+      // decoration: MyStyle().boxLightGreen,
+      // height: 35.0,
+      width: MediaQuery.of(context).size.width * 0.35,
+      padding: EdgeInsets.only(left: 20.0, right: 10.0),
+      child: Column(
+        children: <Widget>[
+          TextFormField(
+            style: TextStyle(color: Colors.black),
+            initialValue: '${iniValue}',
+            // readOnly: (unitSizeModels[index].price == 0)?true:false,
+            readOnly: readOnlyMode,
+            keyboardType: TextInputType.number,
+            onChanged: (value) {
+              if (index == 0)
+                qtyS = value;
+              else if (index == 1)
+                qtyM = value;
+              else if (index == 2) qtyL = value;
+            },
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.only(
+                top: 6.0,
+              ),
+              prefixIcon: Icon(iconName, color: iconColor),
+              // border: InputBorder.none,
+              // hintText: 'ระบุจำนวน',
+              hintStyle: TextStyle(color: iconColor),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -166,9 +242,9 @@ class _DetailState extends State<Detail> {
     );
   }
 
-  Widget showValue(int value) {
-    return Text('$value');
-  }
+  // Widget showValue(int value) {
+  //   return Text('$value');
+  // }
 
   Widget incDecValue(int index) {
     int value = amounts[index];
@@ -202,13 +278,36 @@ class _DetailState extends State<Detail> {
     String url =
         'http://www.somsakpharma.com/api/json_loadmycart.php?memberId=$memberId';
 
-        print('url Detail =====>>>>>>>> $url');
+    print('url Detail =====>>>>>>>> $url');
 
     http.Response response = await http.get(url);
     var result = json.decode(response.body);
     var cartList = result['cart'];
-
+    var thisproductID = id;
     for (var map in cartList) {
+      var productID = map['id'].toString();
+
+      if (productID == thisproductID) {
+        if (map['price_list']['s'] != null) {
+          var sizeSincart = int.parse(map['price_list']['s']['quantity']);
+          setState(() {
+            showSincart = sizeSincart.toString();
+          });
+        }
+        if (map['price_list']['m'] != null) {
+          int sizeMincart = int.parse(map['price_list']['m']['quantity']);
+          setState(() {
+            showMincart = sizeMincart.toString();
+          });
+        }
+        if (map['price_list']['l'] != null) {
+          int sizeLincart = int.parse(map['price_list']['l']['quantity']);
+          setState(() {
+            showLincart = sizeLincart.toString();
+          });
+        }
+      }
+
       setState(() {
         amontCart++;
       });
@@ -285,49 +384,72 @@ class _DetailState extends State<Detail> {
                   'Add to Cart',
                   style: TextStyle(
                       fontSize: 18.0,
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
                 ),
                 onPressed: () {
                   String productID = id;
                   String memberID = myUserModel.id.toString();
 
-                  int index = 0;
-                  List<bool> status = List();
+                  // int index = 0;
+                  // List<bool> status = List();
 
-                  for (var object in unitSizeModels) {
-                    if (amounts[index] == 0) {
-                      status.add(true);
-                    } else {
-                      status.add(false);
-                    }
+                  // for (var object in unitSizeModels) {
+                  //   if (amounts[index] == 0) {
+                  //     status.add(true);
+                  //   } else {
+                  //     status.add(false);
+                  //   }
 
-                    index++;
+                  //   index++;
+                  // }
+
+                  // bool sumStatus = true;
+                  // if (status.length == 1) {
+                  //   sumStatus = status[0];
+                  // } else {
+                  //   sumStatus = status[0] && status[1];
+                  // }
+
+                  // if (sumStatus) {
+                  //   normalDialog(
+                  //       context, 'Do not choose item', 'Please choose item');
+                  // } else {
+                  //   int index = 0;
+                  //   for (var object in unitSizeModels) {
+                  //     String unitSize = unitSizeModels[index].unit;
+                  //     int qTY = amounts[index];
+
+                  //     print(
+                  //         'productID = $productID, memberID=$memberID, unitSize=$unitSize, QTY=$qTY');
+                  //     if (qTY != 0) {
+                  //       addCart(productID, unitSize, qTY, memberID);
+                  //     }
+                  //     index++;
+                  //   }
+                  // }
+
+                if (qtyS != 0 && qtyS != '') {
+                    String unitSize = 's';
+                    print(
+                        'productID = $productID, memberID=$memberID, unitSize=s, QTY=$qtyS');
+                    addCart(productID, unitSize, qtyS, memberID);
+                  }
+                  if (qtyM != 0 && qtyM != '') {
+                    String unitSize = 'm';
+                    print(
+                        'productID = $productID, memberID=$memberID, unitSize=m, QTY=$qtyM');
+                    addCart(productID, unitSize, qtyM, memberID);
+                  }
+                  if (qtyL != 0 && qtyL != '') {
+                    String unitSize = 'l';
+                    print(
+                        'productID = $productID, memberID=$memberID, unitSize=l, QTY=$qtyL');
+                    addCart(productID, unitSize, qtyL, memberID);
                   }
 
-                  bool sumStatus = true;
-                  if (status.length == 1) {
-                    sumStatus = status[0];
-                  } else {
-                    sumStatus = status[0] && status[1];
-                  }
 
-                  if (sumStatus) {
-                    normalDialog(
-                        context, 'Do not choose item', 'Please choose item');
-                  } else {
-                    int index = 0;
-                    for (var object in unitSizeModels) {
-                      String unitSize = unitSizeModels[index].unit;
-                      int qTY = amounts[index];
 
-                      print(
-                          'productID = $productID, memberID=$memberID, unitSize=$unitSize, QTY=$qTY');
-                      if (qTY != 0) {
-                        addCart(productID, unitSize, qTY, memberID);
-                      }
-                      index++;
-                    }
-                  }
                 },
               ),
             ),
@@ -338,20 +460,20 @@ class _DetailState extends State<Detail> {
   }
 
   Future<void> addCart(
-      String productID, String unitSize, int qTY, String memberID) async {
+      String productID, String unitSize, var qTY, String memberID) async {
     String url =
         'http://www.somsakpharma.com/api/json_savemycart.php?productID=$productID&unitSize=$unitSize&QTY=$qTY&memberId=$memberID';
 
     http.Response response = await http.get(url).then((response) {
       print('upload ok');
       // MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext buildContext){return DetailCart(userModel: myUserModel,);});
-      Navigator.pop(context,true);
+      Navigator.pop(context, true);
     });
   }
 
   Widget showDetailList() {
     return Card(
-          child: Stack(
+      child: Stack(
         children: <Widget>[
           showController(),
           addButton(),
@@ -365,9 +487,9 @@ class _DetailState extends State<Detail> {
       padding: EdgeInsets.all(10.0),
       children: <Widget>[
         showImage(),
-         MyStyle().mySizebox(),
+        MyStyle().mySizebox(),
         showTitle(),
-         MyStyle().mySizebox(),
+        MyStyle().mySizebox(),
         showDetail(),
         showPrice(),
       ],
