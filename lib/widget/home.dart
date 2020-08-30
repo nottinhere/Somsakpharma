@@ -14,6 +14,7 @@ import 'package:somsakpharma/scaffold/detail_cart.dart';
 import 'package:somsakpharma/scaffold/list_product.dart';
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class Home extends StatefulWidget {
   final UserModel userModel;
@@ -379,7 +380,7 @@ class _HomeState extends State<Home> {
 
   Widget bottomRight() {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.4,
+      width: MediaQuery.of(context).size.width * 0.45,
       // height: 80.0,
       child: GestureDetector(
         child: Card(
@@ -391,10 +392,10 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_recommend.png'),
+                  child: Image.asset('images/icon_history.png'),
                 ),
                 Text(
-                  'Recommend',
+                  'ประวัติการสั่ง',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -405,37 +406,18 @@ class _HomeState extends State<Home> {
           ),
         ),
         onTap: () {
-          print('You click recommend');
-          routeToListProduct(3);
+          print('You click order history');
+            Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => WebView(userModel: myUserModel,)));
         },
       ),
     );
   }
 
-/*
-  Widget productMenu() {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.4,
-      height: 80.0,
-      child: GestureDetector(
-        child: Card(
-          color: Colors.green.shade100,
-          child: Container(
-            alignment: AlignmentDirectional(0.0, 0.0),
-            child: Text(
-              'recommend',
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-        ),
-        onTap: () {
-          print('You click recommend');
-          routeToListProduct(3);
-        },
-      ),
-    );
-  }
-*/
+  
+  
+
+
   Widget bottomMenu() {
     return Row(
       // mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -443,7 +425,7 @@ class _HomeState extends State<Home> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         bottomLeft(),
-        // bottomRight(),
+        bottomRight(),
       ],
     );
   }
@@ -585,6 +567,83 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class WebViewWidget extends StatefulWidget {
+  WebViewWidget({Key key}) : super(key: key);
+
+  @override
+  _WebViewWidgetState createState() => _WebViewWidgetState();
+}
+
+class _WebViewWidgetState extends State {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Sample WebView Widget"),
+          backgroundColor: MyStyle().bgColor,
+        ),
+        body: Center(
+          child: Column(
+            children: [
+              Container(
+                child: FlatButton(
+                    child: Text("Open my Blog"),
+                    onPressed: () {
+                      print("in");
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => WebView()));
+                    }),
+              )
+            ],
+          ),
+        ));
+  }
+}
+
+class WebView extends StatefulWidget {
+  final UserModel userModel;
+
+  WebView({Key key, this.userModel}) : super(key: key);
+
+  @override
+  _WebViewState createState() => _WebViewState();
+}
+
+class _WebViewState extends State<WebView> {
+  UserModel myUserModel;
+
+  @override
+  void initState() {
+    super.initState();
+    myUserModel = widget.userModel;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String memberId = myUserModel.id;
+    String memberCode = myUserModel.customerCode;
+    String url = 'https://www.somsakpharma.com/shop/pages/tables/orderhistory_mobile.php?memberId=$memberId&memberCode=$memberCode'; // 
+    print('URL ==>> $url');
+    return WebviewScaffold(
+      url: url,//"https://www.androidmonks.com",
+      appBar: AppBar(
+        backgroundColor: MyStyle().bgColor,
+        title: Text("ประวัติการสั่งซื้อ"),
+      ),
+      withZoom: true,
+      withJavascript: true,
+      withLocalStorage: true,
+      appCacheEnabled: false,
+      ignoreSSLErrors: true,
     );
   }
 }
