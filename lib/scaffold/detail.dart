@@ -118,14 +118,14 @@ class _DetailState extends State<Detail> {
   Widget showPackage(int index) {
     return Text(
       unitSizeModels[index].lable,
-      style: MyStyle().h3Style,
+      style: MyStyle().h2Style,
     );
   }
 
   Widget showPricePackage(int index) {
     return Text(
       '${unitSizeModels[index].price.toString()} บาท/ ',
-      style: MyStyle().h3Style,
+      style: MyStyle().h2Style,
     );
   }
 

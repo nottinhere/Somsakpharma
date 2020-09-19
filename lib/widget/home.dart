@@ -32,12 +32,15 @@ class _HomeState extends State<Home> {
   List<Widget> suggestLists = List();
   List<String> urlImages = List();
   List<String> urlImagesSuggest = List();
+  List<String> productsName = List();
 
   int amontCart = 0, banerIndex = 0, suggessIndex = 0;
   UserModel myUserModel;
   List<ProductAllModel> promoteModels = List();
   List<ProductAllModel> suggestModels = List();
   String qrString;
+  int currentIndex = 0;
+  
   // Method
   @override
   void initState() {
@@ -82,11 +85,15 @@ class _HomeState extends State<Home> {
       PromoteModel promoteModel = PromoteModel.fromJson(map);
       ProductAllModel productAllModel = ProductAllModel.fromJson(map);
       String urlImage = promoteModel.photo;
+      String productName = promoteModel.title;
+
       setState(() {
         //promoteModels.add(promoteModel); // push ค่าลง array
         suggestModels.add(productAllModel);
         suggestLists.add(Image.network(urlImage));
         urlImagesSuggest.add(urlImage);
+        productsName.add(productName);
+
       });
     }
   }
@@ -129,6 +136,59 @@ class _HomeState extends State<Home> {
   }
 
   Widget showCarouseSliderSuggest() {
+
+    //  return GestureDetector(
+    //   child: CarouselSlider.builder(
+    //     pauseAutoPlayOnTouch: Duration(seconds: 5),
+    //     autoPlay: true,
+    //     autoPlayAnimationDuration: Duration(seconds: 5),
+    //     itemCount: (suggestLists.length / 2).round(),
+    //     itemBuilder: (context, index) {
+    //       final int first = index * 2;
+    //       final int second = first + 1;
+
+    //       return Row(
+    //         children: [first, second].map((idx) {
+    //           return Expanded(
+    //             child: GestureDetector(
+    //                 child: Card(
+    //               // flex: 1,
+    //               child: Column(
+    //                 children: <Widget>[
+    //                   Container(
+    //                     // width: MediaQuery.of(context).size.width * 0.50,
+    //                     height: 100.00,
+    //                     child: suggestLists[idx],
+    //                     padding: EdgeInsets.all(8.0),
+    //                   ),
+    //                   Text(
+    //                     productsName[idx].toString(),
+    //                     style: TextStyle(
+    //                         fontSize: 14,
+    //                         fontWeight: FontWeight.bold,
+    //                         color: Colors.green),
+    //                   ),
+    //                 ],
+    //               ),
+    //             ),    
+    //               onTap: () {
+    //                 print('You Click index >> $idx');
+    //                 MaterialPageRoute route = MaterialPageRoute(
+    //                   builder: (BuildContext context) => Detail(
+    //                     productAllModel: suggestModels[idx],
+    //                     userModel: myUserModel,
+    //                   ),
+    //                 );
+    //                 Navigator.of(context).push(route).then((value) {});
+    //               },
+    //             ),
+    //           );
+    //         }).toList(),
+    //       );
+    //     },
+    //   ),
+    // );
+ 
     return GestureDetector(
       onTap: () {
         print('You Click index is $suggessIndex');
@@ -147,13 +207,40 @@ class _HomeState extends State<Home> {
         pauseAutoPlayOnTouch: Duration(seconds: 5),
         autoPlay: true,
         autoPlayAnimationDuration: Duration(seconds: 5),
-        items: suggestLists,
+        items: suggestLists
+            .map((item) => Container(
+                  child: Center(
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          // width: MediaQuery.of(context).size.width * 0.50,
+                          height: 135.00,
+                          child: item,
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Text(
+                          productsName[suggessIndex++].toString(),
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // color: Colors.grey.shade200,
+                ))
+            .toList(),
+
         onPageChanged: (int index) {
           suggessIndex = index;
           // print('index = $index');
         },
       ),
     );
+    
+
+
   }
 
   Widget promotion() {
