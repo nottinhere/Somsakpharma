@@ -103,13 +103,16 @@ class _AuthenState extends State<Authen> {
           '${MyStyle().getUserWhereUserAndPass}?username=$user&password=$password';
       http.Response response = await http
           .get(url); // await จะต้องทำงานใน await จะเสร็จจึงจะไปทำ process ต่อไป
+      print('url = $url');
+
       var result = json.decode(response.body);
       int statusInt = result['status'];
       print('statusInt = $statusInt');
 
       if (statusInt == 0) {
         String message = result['message'];
-        normalDialog(context, 'ข้อมูลไม่ถูกต้อง', message);
+        // normalDialog(context, 'ข้อมูลไม่ถูกต้อง', message);
+        normalDialogLogin(context, 'ข้อมูลไม่ถูกต้อง', message);
       } else if (statusInt == 1) {
         Map<String, dynamic> map = result['data'];
         print('map = $map');
@@ -123,13 +126,48 @@ class _AuthenState extends State<Authen> {
       }
       if (statusInt == 2) {
         String message = 'กรุณาติดต่อทางร้าน';
-        normalDialog(context, 'ข้อมูลไม่ถูกต้อง !!!', message);
+        normalDialogLogin(context, 'ข้อมูลไม่ถูกต้อง !!!', message);
       }
     }
   }
 
+  Future<void> normalDialogLogin(
+    BuildContext buildContext,
+    String title,
+    String message,
+  ) async {
+    showDialog(
+      context: buildContext,
+      builder: (BuildContext buildContext) {
+        return AlertDialog(
+          title: showTitle(title),
+          content: Text(message),
+          actions: <Widget>[okButtonLogin(buildContext)],
+        );
+      },
+    );
+  }
 
+  Widget okButtonLogin(BuildContext buildContext) {
+    return FlatButton(
+      child: Text('OK'),
+      onPressed: () {
+        // Navigator.of(buildContext).pop();  // pop คือการทำให้มันหายไป
+        logOut();
+        MaterialPageRoute materialPageRoute =
+            MaterialPageRoute(builder: (BuildContext buildContext) {
+          return Authen();
+        });
+        Navigator.of(context).push(materialPageRoute);
+      },
+    );
+  }
 
+  Future<void> logOut() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.clear();
+    // exit(0);
+  }
 
   Future<void> saveSharePreference() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -237,9 +275,8 @@ class _AuthenState extends State<Authen> {
       child: CircularProgressIndicator(),
     );
   }
-  
 
-    Widget register() {
+  Widget register() {
     return Text(
       'สมัครสมาชิก',
       style: TextStyle(
@@ -251,7 +288,6 @@ class _AuthenState extends State<Authen> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

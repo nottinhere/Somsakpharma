@@ -12,6 +12,7 @@ import 'package:somsakpharma/scaffold/detail.dart';
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
 import 'package:somsakpharma/widget/home.dart';
+import 'package:flutter_spinbox/flutter_spinbox.dart';
 
 import 'my_service.dart';
 
@@ -36,7 +37,7 @@ class _DetailCartState extends State<DetailCart> {
   List<Map<String, dynamic>> mMap = List();
   List<Map<String, dynamic>> lMap = List();
   int amontCart = 0;
-  String newQTY = '';
+  double newQTY = 0;
   int newQTYint = 0;
   double total = 0;
   String transport;
@@ -205,24 +206,28 @@ class _DetailCartState extends State<DetailCart> {
   }
 
   Widget alertContent(int index, String size) {
-    String quantity = '';
+    double quantity = 0;
+    String unitText = '';
 
     if (size == 's') {
-      quantity = priceListSModels[index].quantity;
-      newQTY = quantity;
+      quantity = double.parse(priceListSModels[index].quantity);
+      newQTY = (quantity).toDouble();
+      unitText = priceListSModels[index].lable;
     } else if (size == 'm') {
-      quantity = priceListMModels[index].quantity;
-      newQTY = quantity;
+      quantity = double.parse(priceListMModels[index].quantity);
+      newQTY = (quantity).toDouble();
+      unitText = priceListMModels[index].lable;
     } else if (size == 'l') {
-      quantity = priceListLModels[index].quantity;
-      newQTY = quantity;
+      quantity = double.parse(priceListLModels[index].quantity);
+      newQTY = (quantity).toDouble();
+      unitText = priceListLModels[index].lable;
     }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(productAllModels[index].title),
-        Text('Size = $size'),
+        Text('Size = $unitText'),
         Container(
           // width: 50.0,
           child: editQTY(quantity),
@@ -249,25 +254,22 @@ class _DetailCartState extends State<DetailCart> {
     return Text('$value');
   }
 
-  Widget editQTY(String quantity) {
-    /*
-      newQTYint = int.parse(quantity);
-      return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        decButton(),
-        showValue(newQTYint),
-        incButton(),
-      ],
-    );
-    */
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      onChanged: (String string) {
-        newQTY = string.trim();
-      },
-      initialValue: quantity,
-    );
+  Widget editQTY(double quantity) {
+    // return TextFormField(
+    //   keyboardType: TextInputType.number,
+    //   onChanged: (String string) {
+    //     newQTY = string.trim();
+    //   },
+    //   initialValue: quantity,
+    // );
+
+    return SpinBox(
+        value: (quantity).toDouble(),
+        onChanged: (changevalue) {
+          newQTY = (changevalue == 0) ? 0 : (changevalue).toDouble();
+        }
+        // decoration: InputDecoration(labelText: 'Decimals'),
+        );
   }
 
   void myAlertDialog(int index, String size) {
@@ -311,7 +313,7 @@ class _DetailCartState extends State<DetailCart> {
 
     await http.get(url).then((response) {
       setState(() {
-        readCart();      
+        readCart();
       });
     });
   }
@@ -374,7 +376,7 @@ class _DetailCartState extends State<DetailCart> {
 
     await http.get(url).then((response) {
       setState(() {
-        readCart();      
+        readCart();
       });
     });
   }
@@ -514,8 +516,10 @@ class _DetailCartState extends State<DetailCart> {
 
   Widget showTitleTransport() {
     return Text(
-      'การจัดส่ง : ${listTransport[index]}',
+      'เลือกการจัดส่ง : ${listTransport[index]}',
       style: TextStyle(
+        color: Colors.red,
+        fontWeight: FontWeight.bold,
         fontSize: 24.0,
       ),
     );
@@ -715,7 +719,7 @@ class _DetailCartState extends State<DetailCart> {
           //     readCart();
           //   });
           // });
-            Navigator.of(context).push(route).then((value)=>readCart());    
+          Navigator.of(context).push(route).then((value) => readCart());
         }
       }
     } catch (e) {}

@@ -9,6 +9,7 @@ import 'package:somsakpharma/models/user_model.dart';
 import 'package:somsakpharma/scaffold/detail_cart.dart';
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
+import 'package:flutter_spinbox/flutter_spinbox.dart';
 
 class Detail extends StatefulWidget {
   final ProductAllModel productAllModel;
@@ -34,9 +35,11 @@ class _DetailState extends State<Detail> {
   UserModel myUserModel;
   String id; // productID
 
-  String qtyS = '', qtyM = '', qtyL = '';
+  // String qtyS = '', qtyM = '', qtyL = '';
   int sizeSincart = 0, sizeMincart = 0, sizeLincart = 0;
-  var showSincart = '', showMincart = '', showLincart = '';
+  int qtyS = 0, qtyM = 0, qtyL = 0;
+  int showSincart = 0, showMincart = 0, showLincart = 0;
+  // var showSincart = '', showMincart = '', showLincart = '';
 
   // Method
   @override
@@ -143,16 +146,17 @@ class _DetailState extends State<Detail> {
   Widget showValue(int index) {
     // int value = amounts[index];
     //  return Text('$value');
-    var iniValue = '';
+    // var iniValue = '';
+    int iniValue = 0;
     bool readOnlyMode;
     var iconName;
     var iconColor;
     // print('$sizeSincart / $sizeMincart / $sizeLincart ');
     if (index == 0)
-      iniValue = showSincart.toString();
+      iniValue = showSincart;
     else if (index == 1)
-      iniValue = showMincart.toString();
-    else if (index == 2) iniValue = showLincart.toString();
+      iniValue = showMincart;
+    else if (index == 2) iniValue = showLincart;
     /////////////////////////////////////////////////////////
     if (unitSizeModels[index].price.toString() == '0') {
       readOnlyMode = true;
@@ -167,32 +171,55 @@ class _DetailState extends State<Detail> {
     return Container(
       // decoration: MyStyle().boxLightGreen,
       // height: 35.0,
-      width: MediaQuery.of(context).size.width * 0.35,
+      width: MediaQuery.of(context).size.width * 0.48,
       padding: EdgeInsets.only(left: 20.0, right: 10.0),
       child: Column(
         children: <Widget>[
-          TextFormField(
-            style: TextStyle(color: Colors.black),
-            initialValue: '${iniValue}',
-            // readOnly: (unitSizeModels[index].price == 0)?true:false,
-            readOnly: readOnlyMode,
-            keyboardType: TextInputType.number,
-            onChanged: (value) {
-              if (index == 0)
-                qtyS = value;
-              else if (index == 1)
-                qtyM = value;
-              else if (index == 2) qtyL = value;
-            },
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.only(
-                top: 6.0,
-              ),
-              prefixIcon: Icon(iconName, color: iconColor),
-              // border: InputBorder.none,
-              // hintText: 'ระบุจำนวน',
-              hintStyle: TextStyle(color: iconColor),
+          // TextFormField(
+          //   style: TextStyle(color: Colors.black),
+          //   initialValue: '${iniValue}',
+          //   // readOnly: (unitSizeModels[index].price == 0)?true:false,
+          //   readOnly: readOnlyMode,
+          //   keyboardType: TextInputType.number,
+          //   onChanged: (value) {
+          //     if (index == 0)
+          //       qtyS = value;
+          //     else if (index == 1)
+          //       qtyM = value;
+          //     else if (index == 2) qtyL = value;
+          //   },
+          //   decoration: InputDecoration(
+          //     contentPadding: EdgeInsets.only(
+          //       top: 6.0,
+          //     ),
+          //     prefixIcon: Icon(iconName, color: iconColor),
+          //     // border: InputBorder.none,
+          //     // hintText: 'ระบุจำนวน',
+          //     hintStyle: TextStyle(color: iconColor),
+          //   ),
+          // ),
+          Padding(
+            child: SpinBox(
+              value: (iniValue)
+                  .toDouble(), //(iniValue == 0) ? 0 : (iniValue).toInt(),
+              onChanged: (changevalue) {
+                if (index == 0) {
+                  setState(() {
+                    qtyS = (changevalue == 0) ? 0 : (changevalue).toInt();
+                  });
+                } else if (index == 1) {
+                  setState(() {
+                    qtyM = (changevalue == 0) ? 0 : (changevalue).toInt();
+                  });
+                } else if (index == 2) {
+                  setState(() {
+                    qtyL = (changevalue == 0) ? 0 : (changevalue).toInt();
+                  });
+                }
+              },
+              // decoration: InputDecoration(labelText: 'Decimals'),
             ),
+            padding: const EdgeInsets.all(2),
           ),
         ],
       ),
@@ -291,19 +318,19 @@ class _DetailState extends State<Detail> {
         if (map['price_list']['s'] != null) {
           var sizeSincart = int.parse(map['price_list']['s']['quantity']);
           setState(() {
-            showSincart = sizeSincart.toString();
+            showSincart = sizeSincart;
           });
         }
         if (map['price_list']['m'] != null) {
           int sizeMincart = int.parse(map['price_list']['m']['quantity']);
           setState(() {
-            showMincart = sizeMincart.toString();
+            showMincart = sizeMincart;
           });
         }
         if (map['price_list']['l'] != null) {
           int sizeLincart = int.parse(map['price_list']['l']['quantity']);
           setState(() {
-            showLincart = sizeLincart.toString();
+            showLincart = sizeLincart;
           });
         }
       }
@@ -429,7 +456,7 @@ class _DetailState extends State<Detail> {
                   //   }
                   // }
 
-                if (qtyS != 0 && qtyS != '') {
+                  if (qtyS != 0 && qtyS != '') {
                     String unitSize = 's';
                     print(
                         'productID = $productID, memberID=$memberID, unitSize=s, QTY=$qtyS');
@@ -447,9 +474,6 @@ class _DetailState extends State<Detail> {
                         'productID = $productID, memberID=$memberID, unitSize=l, QTY=$qtyL');
                     addCart(productID, unitSize, qtyL, memberID);
                   }
-
-
-
                 },
               ),
             ),

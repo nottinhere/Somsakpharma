@@ -11,6 +11,10 @@ import 'package:somsakpharma/utility/normal_dialog.dart';
 import 'detail.dart';
 import 'detail_cart.dart';
 
+import 'package:loading/loading.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:flutter/cupertino.dart';
+
 class ListProduct extends StatefulWidget {
   final int index;
   final UserModel userModel;
@@ -53,7 +57,7 @@ class _ListProductState extends State<ListProduct> {
   final Debouncer debouncer =
       Debouncer(milliseconds: 500); // ตั้งค่า เวลาที่จะ delay
   bool statusStart = true;
-
+  bool visible = true;
   // Method
   @override
   void initState() {
@@ -72,19 +76,17 @@ class _ListProductState extends State<ListProduct> {
 
   void createController() {
     scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        page++;
-        readData();
-
-        // print('in the end');
-
-        // setState(() {
-        //   amountListView = amountListView + 2;
-        //   if (amountListView > filterProductAllModels.length) {
-        //     amountListView = filterProductAllModels.length;
-        //   }
-        // });
+      if (scrollController.position.atEdge) {
+        if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent) {
+          page++;
+          readData();
+          print('in the end');
+        }
+      } else {
+        setState(() {
+          visible = false;
+        });
       }
     });
   }
@@ -145,7 +147,10 @@ class _ListProductState extends State<ListProduct> {
   }
 
   Future<void> readData() async {
-    // String url = MyStyle().readAllProduct;
+    print('Here is readdata function');
+    setState(() {
+      visible = true;
+    });
     String url =
         'http://somsakpharma.com/api/json_product.php?searchKey=$searchString&page=$page';
     if (myIndex != 0) {
@@ -160,6 +165,8 @@ class _ListProductState extends State<ListProduct> {
     // print('result ListProduct ========>>>>> $result');
 
     var itemProducts = result['itemsProduct'];
+    int i = 0;
+    int len = (filterProductAllModels.length);
 
     for (var map in itemProducts) {
       ProductAllModel productAllModel = ProductAllModel.fromJson(map);
@@ -167,8 +174,14 @@ class _ListProductState extends State<ListProduct> {
       setState(() {
         productAllModels.add(productAllModel);
         filterProductAllModels = productAllModels;
+        print(
+            ' >> ${len} =>($i)  ${productAllModel.id}  || ${productAllModel.title} (${productAllModel.id})');
       });
+      i = i + 1;
     }
+    setState(() {
+      visible = false;
+    });
   }
 
   Widget showName(int index) {
@@ -277,12 +290,44 @@ class _ListProductState extends State<ListProduct> {
     );
   }
 
+  Widget loading() {
+    return Visibility(
+      maintainSize: true,
+      maintainAnimation: true,
+      maintainState: true,
+      visible: visible,
+      child: Loading(indicator: BallPulseIndicator(), size: 10.0),
+    );
+  }
+
+  Widget myCircularProgress() {
+    return Visibility(
+      maintainSize: true,
+      maintainAnimation: true,
+      maintainState: true,
+      visible: visible,
+      child: Center(child: CupertinoActivityIndicator()),
+    );
+  }
+
   Widget showProductItem() {
+    int perpage = 10;
+    bool loadingIcon = false;
     return Expanded(
       child: ListView.builder(
         controller: scrollController,
         itemCount: productAllModels.length,
         itemBuilder: (BuildContext buildContext, int index) {
+          if ((index + 1) % perpage == 0) {
+            loadingIcon = true;
+          } else {
+            loadingIcon = false;
+          }
+
+          if (loadingIcon == true) {
+            // return CupertinoActivityIndicator();
+            return myCircularProgress();
+          }
           return GestureDetector(
             child: Card(
               child: Container(
