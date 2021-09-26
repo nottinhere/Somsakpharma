@@ -8,6 +8,8 @@ import 'package:somsakpharma/models/product_all_model.dart';
 import 'package:somsakpharma/models/user_model.dart';
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
+import 'package:somsakpharma/scaffold/my_service.dart';
+
 import 'detail.dart';
 import 'detail_cart.dart';
 
@@ -58,6 +60,9 @@ class _ListProductState extends State<ListProduct> {
       Debouncer(milliseconds: 500); // ตั้งค่า เวลาที่จะ delay
   bool statusStart = true;
   bool visible = true;
+
+  var _controller = TextEditingController();
+
   // Method
   @override
   void initState() {
@@ -311,51 +316,81 @@ class _ListProductState extends State<ListProduct> {
   }
 
   Widget showProductItem() {
-    int perpage = 10;
+    int perpage = 20;
     bool loadingIcon = false;
     return Expanded(
       child: ListView.builder(
-        controller: scrollController,
-        itemCount: productAllModels.length,
-        itemBuilder: (BuildContext buildContext, int index) {
-          if ((index + 1) % perpage == 0) {
-            loadingIcon = true;
-          } else {
-            loadingIcon = false;
-          }
+          controller: scrollController,
+          itemCount: productAllModels.length,
+          itemBuilder: (BuildContext buildContext, int index) {
+            if ((index + 1) % perpage == 0) {
+              loadingIcon = true;
+            } else {
+              loadingIcon = false;
+            }
 
-          if (loadingIcon == true) {
-            // return CupertinoActivityIndicator();
-            return myCircularProgress();
-          }
-          return GestureDetector(
-            child: Card(
-              child: Container(
-                decoration: myBoxDecoration(),
-                padding: EdgeInsets.only(top: 0.5),
-                child: Row(
-                  children: <Widget>[
-                    showImage(index),
-                    showText(index),
-                  ],
+            if (loadingIcon == true) {
+              // return CupertinoActivityIndicator();
+              return Column(
+                children: [
+                  GestureDetector(
+                    child: Card(
+                      child: Container(
+                        decoration: myBoxDecoration(),
+                        padding: EdgeInsets.only(top: 0.5),
+                        child: Row(
+                          children: <Widget>[
+                            showImage(index),
+                            showText(index),
+                          ],
+                        ),
+                      ),
+                    ),
+                    onTap: () {
+                      MaterialPageRoute materialPageRoute = MaterialPageRoute(
+                          builder: (BuildContext buildContext) {
+                        return Detail(
+                          productAllModel: filterProductAllModels[index],
+                          userModel: myUserModel,
+                        );
+                      });
+                      Navigator.of(context)
+                          .push(materialPageRoute)
+                          .then((value) => readCart());
+                    },
+                  ),
+                  myCircularProgress(),
+                ],
+              );
+            }
+
+            return GestureDetector(
+              child: Card(
+                child: Container(
+                  decoration: myBoxDecoration(),
+                  padding: EdgeInsets.only(top: 0.5),
+                  child: Row(
+                    children: <Widget>[
+                      showImage(index),
+                      showText(index),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            onTap: () {
-              MaterialPageRoute materialPageRoute =
-                  MaterialPageRoute(builder: (BuildContext buildContext) {
-                return Detail(
-                  productAllModel: filterProductAllModels[index],
-                  userModel: myUserModel,
-                );
-              });
-              Navigator.of(context)
-                  .push(materialPageRoute)
-                  .then((value) => readCart());
-            },
-          );
-        },
-      ),
+              onTap: () {
+                MaterialPageRoute materialPageRoute =
+                    MaterialPageRoute(builder: (BuildContext buildContext) {
+                  return Detail(
+                    productAllModel: filterProductAllModels[index],
+                    userModel: myUserModel,
+                  );
+                });
+                Navigator.of(context)
+                    .push(materialPageRoute)
+                    .then((value) => readCart());
+              },
+            );
+          }),
     );
   }
 
@@ -425,6 +460,7 @@ class _ListProductState extends State<ListProduct> {
         //       });
         //     }),
         title: TextField(
+          controller: _controller,
           textAlign: TextAlign.center,
           scrollPadding: EdgeInsets.all(5.00),
           style: TextStyle(
@@ -432,7 +468,13 @@ class _ListProductState extends State<ListProduct> {
               fontWeight: FontWeight.w300,
               fontSize: 18.00),
           decoration: InputDecoration(
-              border: OutlineInputBorder(), hintText: 'ค้นหาสินค้า'),
+            border: OutlineInputBorder(),
+            hintText: 'ค้นหาสินค้า',
+            suffixIcon: IconButton(
+              onPressed: () => _controller.clear(),
+              icon: Icon(Icons.clear),
+            ),
+          ),
           onChanged: (String string) {
             searchString = string.trim();
           },
@@ -461,6 +503,61 @@ class _ListProductState extends State<ListProduct> {
     }
   }
 
+  BottomNavigationBarItem homeBotton() {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.home),
+      title: Text('Home'),
+    );
+  }
+
+  BottomNavigationBarItem productBotton() {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.medical_services),
+      title: Text('Product'),
+    );
+  }
+
+  BottomNavigationBarItem cartBotton() {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.shopping_cart),
+      title: Text('Cart'),
+    );
+  }
+
+  BottomNavigationBarItem readQrBotton() {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.camera_alt),
+      title: Text('Barcode Scan'),
+    );
+  }
+
+  Widget showBottomBarNav() {
+    return BottomNavigationBar(
+      currentIndex: 1,
+      items: <BottomNavigationBarItem>[
+        homeBotton(),
+        productBotton(),
+        cartBotton(),
+        // readQrBotton(),
+      ],
+      onTap: (int index) {
+        print('index =$index');
+        if (index == 0) {
+          // routeToDetailCart();
+          MaterialPageRoute route = MaterialPageRoute(
+            builder: (value) => MyService(
+              userModel: myUserModel,
+            ),
+          );
+          Navigator.of(context).pushAndRemoveUntil(route, (route) => false);
+        } else if (index == 2) {
+          routeToDetailCart();
+          // readQRcode();
+        }
+      },
+    );
+  }
+
   Future<void> decodeQRcode(String code) async {
     try {
       String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
@@ -471,7 +568,7 @@ class _ListProductState extends State<ListProduct> {
       int status = result['status'];
       print('status ===>>> $status');
       if (status == 0) {
-        normalDialog(context, 'Not found', 'ไม่พบ code :: $code ในระบบ');
+        normalDialog(context, 'No Code', 'No $code in my Database');
       } else {
         var itemProducts = result['itemsProduct'];
         for (var map in itemProducts) {
@@ -484,6 +581,11 @@ class _ListProductState extends State<ListProduct> {
               productAllModel: productAllModel,
             ),
           );
+          // Navigator.of(context).push(route).then((value) {
+          //   setState(() {
+          //     readCart();
+          //   });
+          // });
           Navigator.of(context).push(route).then((value) => readCart());
         }
       }
@@ -493,6 +595,7 @@ class _ListProductState extends State<ListProduct> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: showBottomBarNav(),
       appBar: AppBar(
         backgroundColor: MyStyle().textColor,
         title: Text('รายการสินค้า'),

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:somsakpharma/models/price_list_model.dart';
 import 'package:somsakpharma/models/product_all_model.dart';
-
+import 'package:somsakpharma/scaffold/list_product.dart';
 import 'package:somsakpharma/models/product_all_model2.dart';
 import 'package:somsakpharma/models/user_model.dart';
 import 'package:somsakpharma/scaffold/detail.dart';
@@ -329,7 +329,7 @@ class _DetailCartState extends State<DetailCart> {
 
   Widget deleteButton(int index, String size) {
     return IconButton(
-      icon: Icon(Icons.remove_circle_outline),
+      icon: Icon(Icons.delete_forever),
       onPressed: () {
         confirmDelete(index, size);
       },
@@ -640,6 +640,13 @@ class _DetailCartState extends State<DetailCart> {
     );
   }
 
+  BottomNavigationBarItem productBotton() {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.medical_services),
+      title: Text('Product'),
+    );
+  }
+
   BottomNavigationBarItem cartBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.shopping_cart),
@@ -656,11 +663,12 @@ class _DetailCartState extends State<DetailCart> {
 
   Widget showBottomBarNav() {
     return BottomNavigationBar(
-      currentIndex: 1,
+      currentIndex: 2,
       items: <BottomNavigationBarItem>[
         homeBotton(),
+        productBotton(),
         cartBotton(),
-        readQrBotton(),
+        // readQrBotton(),
       ],
       onTap: (int index) {
         print('index =$index');
@@ -672,11 +680,22 @@ class _DetailCartState extends State<DetailCart> {
             ),
           );
           Navigator.of(context).pushAndRemoveUntil(route, (route) => false);
-        } else if (index == 2) {
-          readQRcode();
+        } else if (index == 1) {
+          routeToListProduct(0);
         }
       },
     );
+  }
+
+  void routeToListProduct(int index) {
+    MaterialPageRoute materialPageRoute =
+        MaterialPageRoute(builder: (BuildContext buildContext) {
+      return ListProduct(
+        index: index,
+        userModel: myUserModel,
+      );
+    });
+    Navigator.of(context).push(materialPageRoute);
   }
 
   Future<void> readQRcode() async {

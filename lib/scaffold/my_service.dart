@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:somsakpharma/models/product_all_model.dart';
 import 'package:somsakpharma/models/user_model.dart';
 import 'package:somsakpharma/scaffold/detail.dart';
+import 'package:somsakpharma/scaffold/list_product.dart';
 
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
@@ -296,10 +297,28 @@ class _MyServiceState extends State<MyService> {
     });
   }
 
+  void routeToListProduct(int index) {
+    MaterialPageRoute materialPageRoute =
+        MaterialPageRoute(builder: (BuildContext buildContext) {
+      return ListProduct(
+        index: index,
+        userModel: myUserModel,
+      );
+    });
+    Navigator.of(context).push(materialPageRoute);
+  }
+
   BottomNavigationBarItem homeBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.home),
       title: Text('Home'),
+    );
+  }
+
+  BottomNavigationBarItem productBotton() {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.medical_services),
+      title: Text('Product'),
     );
   }
 
@@ -321,16 +340,20 @@ class _MyServiceState extends State<MyService> {
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
         homeBotton(),
+        productBotton(),
         cartBotton(),
-        readQrBotton(),
+        // readQrBotton(),
       ],
       onTap: (int index) {
         print('index =$index');
         if (index == 1) {
-          routeToDetailCart();
+          routeToListProduct(0);
         } else if (index == 2) {
-          readQRcode();
+          routeToDetailCart();
         }
+        //  else if (index == 3) {
+        //   readQRcode();
+        // }
       },
     );
   }

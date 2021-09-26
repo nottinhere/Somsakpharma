@@ -3,6 +3,9 @@ class ProductAllModel2 {
   String productCode;
   String photo;
   PriceList priceList;
+  int itemincartSunit;
+  int itemincartMunit;
+  int itemincartLunit;
   String detail;
   int stock;
   int id;
@@ -12,6 +15,9 @@ class ProductAllModel2 {
       this.productCode,
       this.photo,
       this.priceList,
+      this.itemincartSunit,
+      this.itemincartMunit,
+      this.itemincartLunit,
       this.detail,
       this.stock,
       this.id});
@@ -23,6 +29,9 @@ class ProductAllModel2 {
     priceList = json['price_list'] != null
         ? new PriceList.fromJson(json['price_list'])
         : null;
+    itemincartSunit = json['itemincartSunit'];
+    itemincartMunit = json['itemincartMunit'];
+    itemincartLunit = json['itemincartLunit'];
     detail = json['detail'];
     stock = json['stock'];
     id = json['id'];
@@ -36,6 +45,9 @@ class ProductAllModel2 {
     if (this.priceList != null) {
       data['price_list'] = this.priceList.toJson();
     }
+    data['itemincartSunit'] = this.itemincartSunit;
+    data['itemincartMunit'] = this.itemincartMunit;
+    data['itemincartLunit'] = this.itemincartLunit;
     data['detail'] = this.detail;
     data['stock'] = this.stock;
     data['id'] = this.id;
@@ -82,4 +94,3 @@ class S {
     return data;
   }
 }
-

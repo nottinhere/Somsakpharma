@@ -10,6 +10,8 @@ import 'package:somsakpharma/scaffold/detail_cart.dart';
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:somsakpharma/models/promote_model.dart';
 
 class Detail extends StatefulWidget {
   final ProductAllModel productAllModel;
@@ -41,6 +43,16 @@ class _DetailState extends State<Detail> {
   int showSincart = 0, showMincart = 0, showLincart = 0;
   // var showSincart = '', showMincart = '', showLincart = '';
 
+  List<Widget> promoteLists = List();
+  List<Widget> relateLists = List();
+  List<String> urlImages = List();
+  List<String> urlImagesRelate = List();
+  List<String> productsName = List();
+  List<ProductAllModel> promoteModels = List();
+  List<ProductAllModel> relateModels = List();
+  int banerIndex = 0, relateIndex = 0;
+  int currentIndex = 1;
+
   // Method
   @override
   void initState() {
@@ -51,12 +63,14 @@ class _DetailState extends State<Detail> {
       getProductWhereID();
       readCart();
     });
+    readRelate();
   }
 
   Future<void> getProductWhereID() async {
     if (currentProductAllModel != null) {
+      String memberId = myUserModel.id.toString();
       id = currentProductAllModel.id.toString();
-      String url = '${MyStyle().getProductWhereId}$id';
+      String url = '${MyStyle().getProductWhereId}$id&memberId=$memberId';
       print('url Detaillll ====>>> $url');
       http.Response response = await http.get(url);
       var result = json.decode(response.body);
@@ -88,13 +102,101 @@ class _DetailState extends State<Detail> {
             UnitSizeModel unitSizeModel = UnitSizeModel.fromJson(sizeLmap);
             unitSizeModels.add(unitSizeModel);
           }
+
           print('sizeSmap = $sizeSmap');
           print('sizeMmap = $sizeMmap');
           print('sizeLmap = $sizeLmap');
           // print('unitSizeModel = ${unitSizeModels[0].lable}');
         });
       } // for
+      setState(() {
+        showSincart = productAllModel.itemincartSunit;
+        showMincart = productAllModel.itemincartMunit;
+        showLincart = productAllModel.itemincartLunit;
+      });
     }
+  }
+
+  Future<void> readRelate() async {
+    String memId = myUserModel.id;
+    id = currentProductAllModel.id.toString();
+
+    String url =
+        'http://www.somsakpharma.com/api/json_relate.php?productId=$id'; // ?memberId=$memberId
+
+    print('URL relate >> $url');
+    http.Response response = await http.get(url);
+    var result = json.decode(response.body);
+    var mapItemProduct =
+        result['itemsProduct']; // dynamic    จะส่ง value อะไรก็ได้ รวมถึง null
+    for (var map in mapItemProduct) {
+      PromoteModel promoteModel = PromoteModel.fromJson(map);
+      ProductAllModel productAllModel = ProductAllModel.fromJson(map);
+      String urlImage = promoteModel.photo;
+      String productName = promoteModel.title;
+      setState(() {
+        //promoteModels.add(promoteModel); // push ค่าลง array
+        relateModels.add(productAllModel);
+        relateLists.add(Image.network(urlImage));
+        urlImagesRelate.add(urlImage);
+        productsName.add(productName);
+      });
+    }
+  }
+
+  Widget showCarouseSliderRelate() {
+    return GestureDetector(
+      child: CarouselSlider.builder(
+        pauseAutoPlayOnTouch: Duration(seconds: 5),
+        autoPlay: true,
+        autoPlayAnimationDuration: Duration(seconds: 5),
+        itemCount: (relateModels.length / 2).round(),
+        itemBuilder: (context, index) {
+          final int first = index * 2;
+          final int second = first + 1;
+
+          return Row(
+            children: [first, second].map((idx) {
+                  return Expanded(
+                    child: GestureDetector(
+                      child: Card(
+                        // flex: 1,
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              // width: MediaQuery.of(context).size.width * 0.50,
+                              height: 100.00,
+                              child: relateLists[idx],
+                              padding: EdgeInsets.all(8.0),
+                            ),
+                            Text(
+                              productsName[idx].toString(),
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  // fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        print('You Click index >> $idx');
+                        MaterialPageRoute route = MaterialPageRoute(
+                          builder: (BuildContext context) => Detail(
+                            productAllModel: relateModels[idx],
+                            userModel: myUserModel,
+                          ),
+                        );
+                        Navigator.of(context).push(route).then((value) {});
+                      },
+                    ),
+                  );
+                }).toList() ??
+                [],
+          );
+        },
+      ),
+    );
   }
 
   Widget showImage() {
@@ -226,6 +328,12 @@ class _DetailState extends State<Detail> {
     );
   }
 
+  Widget myCircularProgress() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
   Widget showDetailPrice(int index) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -233,6 +341,18 @@ class _DetailState extends State<Detail> {
         showPricePackage(index),
         showPackage(index),
       ],
+    );
+  }
+
+  Widget relate() {
+    return Card(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.25,
+        child: relateLists.length == 0
+            ? myCircularProgress()
+            : showCarouseSliderRelate(),
+      ),
     );
   }
 
@@ -288,13 +408,45 @@ class _DetailState extends State<Detail> {
 
   Widget showPrice() {
     return Container(
-      height: 150.0,
+      height: 70.0,
       // color: Colors.grey,
       child: ListView.builder(
         itemCount: unitSizeModels.length,
         itemBuilder: (BuildContext buildContext, int index) {
           return showChoosePricePackage(index); // showDetailPrice(index);
         },
+      ),
+    );
+  }
+
+  Widget mySizebox() {
+    return SizedBox(
+      width: 10.0,
+      height: 30.0,
+    );
+  }
+
+  Widget headTitle(String string, IconData iconData) {
+    // Widget  แทน object ประเภทไดก็ได้
+    return Container(
+      padding: EdgeInsets.all(5.0),
+      child: Row(
+        children: <Widget>[
+          Icon(
+            iconData,
+            size: 24.0,
+            color: MyStyle().textColor,
+          ),
+          mySizebox(),
+          Text(
+            string,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: MyStyle().textColor,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -516,6 +668,9 @@ class _DetailState extends State<Detail> {
         MyStyle().mySizebox(),
         showDetail(),
         showPrice(),
+        MyStyle().mySizebox(),
+        headTitle('สินค้าที่เกี่ยวข้อง', Icons.thumb_up),
+        relate(),
       ],
     );
   }
