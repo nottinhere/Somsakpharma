@@ -272,6 +272,64 @@ class _DetailCartState extends State<DetailCart> {
         );
   }
 
+  Widget changeQTY(String productID, String size, double quantity) {
+    String memberID = myUserModel.id.toString();
+
+    // print('$index - $quantity');
+    return SpinBox(
+        value: (quantity).toDouble(),
+        min: 1,
+        onChanged: (changevalue) {
+          newQTY = (changevalue == 0) ? 0 : (changevalue).toDouble();
+          print(
+              'productID = $productID ,unitSize = $size ,memberID = $memberID, newQTY = $newQTY');
+          updateDetailCart(productID, size, memberID);
+        });
+  }
+
+  Future<void> updateDetailCart(
+      String productID, String unitSize, String memberID) async {
+    String url =
+        'http://somsakpharma.com/api/json_updatemycart.php?productID=$productID&unitSize=$unitSize&newQTY=$newQTY&memberId=$memberID';
+    print('url editDetailCart ====>>>>> $url');
+    await http.get(url).then((response) {});
+
+    String url2 = '${MyStyle().loadMyCart}$memberID';
+    http.Response response = await http.get(url2);
+    var result = json.decode(response.body);
+    var cartList = result['cart'];
+
+    double totalPrice = 0;
+    for (var map in cartList) {
+      ProductAllModel2 productAllModel = ProductAllModel2.fromJson(map);
+      // print('productAllModel = ${productAllModel.toJson().toString()}');
+      Map<String, dynamic> priceListMap = map['price_list'];
+
+      var priceDou = 0;
+      var quantityDou = 0;
+
+      Map<String, dynamic> sizeSmap = priceListMap['s'];
+      if (sizeSmap == null) {
+        sMap.add({'lable': ''});
+        PriceListModel priceListModel = PriceListModel.fromJson({'lable': ''});
+        priceListSModels.add(priceListModel);
+      } else {
+        sMap.add(sizeSmap);
+
+        PriceListModel priceListModel = PriceListModel.fromJson(sizeSmap);
+        priceListSModels.add(priceListModel);
+
+        double priceDou = double.parse(priceListModel.price);
+        double quantityDou = (double.parse(priceListModel.quantity));
+        totalPrice = totalPrice + (priceDou * quantityDou);
+      }
+    }
+    setState(() {
+      total = totalPrice;
+      showTotal();
+    });
+  }
+
   void myAlertDialog(int index, String size) {
     showDialog(
         context: context,
@@ -392,9 +450,11 @@ class _DetailCartState extends State<DetailCart> {
   }
 
   Widget showSText(int index) {
+    String productID = productAllModels[index].id.toString();
     String price = sMap[index]['price'].toString();
     String lable = sMap[index]['lable'];
     String quantity = sMap[index]['quantity'];
+    double showQTYS = (quantity == null) ? 0.0 : double.parse(quantity);
 
     //calculateTotal(price, quantity);
 
@@ -412,6 +472,9 @@ class _DetailCartState extends State<DetailCart> {
                 style: MyStyle().h3Style,
               ),
               editAndDeleteButton(index, 's'),
+              // Expanded(
+              //   child: changeQTY(productID, 's', showQTYS),
+              // ),
             ],
           );
   }

@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
   List<ProductAllModel> suggestModels = List();
   String qrString;
   int currentIndex = 0;
-  
+
   // Method
   @override
   void initState() {
@@ -93,7 +93,6 @@ class _HomeState extends State<Home> {
         suggestLists.add(Image.network(urlImage));
         urlImagesSuggest.add(urlImage);
         productsName.add(productName);
-
       });
     }
   }
@@ -125,7 +124,7 @@ class _HomeState extends State<Home> {
         pauseAutoPlayOnTouch: Duration(seconds: 5),
         autoPlay: true,
         autoPlayAnimationDuration: Duration(seconds: 5),
-        items: promoteLists,       
+        items: promoteLists,
         onPageChanged: (int index) {
           banerIndex = index;
           Text('x');
@@ -136,7 +135,6 @@ class _HomeState extends State<Home> {
   }
 
   Widget showCarouseSliderSuggest() {
-
     //  return GestureDetector(
     //   child: CarouselSlider.builder(
     //     pauseAutoPlayOnTouch: Duration(seconds: 5),
@@ -170,7 +168,7 @@ class _HomeState extends State<Home> {
     //                   ),
     //                 ],
     //               ),
-    //             ),    
+    //             ),
     //               onTap: () {
     //                 print('You Click index >> $idx');
     //                 MaterialPageRoute route = MaterialPageRoute(
@@ -188,7 +186,7 @@ class _HomeState extends State<Home> {
     //     },
     //   ),
     // );
- 
+
     return GestureDetector(
       onTap: () {
         print('You Click index is $suggessIndex');
@@ -231,16 +229,12 @@ class _HomeState extends State<Home> {
                   // color: Colors.grey.shade200,
                 ))
             .toList(),
-
         onPageChanged: (int index) {
           suggessIndex = index;
           // print('index = $index');
         },
       ),
     );
-    
-
-
   }
 
   Widget promotion() {
@@ -459,7 +453,7 @@ class _HomeState extends State<Home> {
         onTap: () {
           print('You click barcode scan');
           readQRcode();
-         // Navigator.of(context).pop();
+          // Navigator.of(context).pop();
         },
       ),
     );
@@ -494,16 +488,16 @@ class _HomeState extends State<Home> {
         ),
         onTap: () {
           print('You click order history');
-            Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => WebView(userModel: myUserModel,)));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => WebView(
+                        userModel: myUserModel,
+                      )));
         },
       ),
     );
   }
-
-  
-  
-
 
   Widget bottomMenu() {
     return Row(
@@ -718,10 +712,11 @@ class _WebViewState extends State<WebView> {
   Widget build(BuildContext context) {
     String memberId = myUserModel.id;
     String memberCode = myUserModel.customerCode;
-    String url = 'https://www.somsakpharma.com/shop/pages/tables/orderhistory_mobile.php?memberId=$memberId&memberCode=$memberCode'; // 
+    String url =
+        'https://www.somsakpharma.com/shop/pages/tables/orderhistory_mobile.php?memberId=$memberId&memberCode=$memberCode'; //
     print('URL ==>> $url');
     return WebviewScaffold(
-      url: url,//"https://www.androidmonks.com",
+      url: url, //"https://www.androidmonks.com",
       appBar: AppBar(
         backgroundColor: MyStyle().bgColor,
         title: Text("ประวัติการสั่งซื้อ"),
