@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:barcode_scan/barcode_scan.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:somsakpharma/models/price_list_model.dart';
@@ -763,7 +763,7 @@ class _DetailCartState extends State<DetailCart> {
 
   Future<void> readQRcode() async {
     try {
-      String qrString = await BarcodeScanner.scan();
+      var qrString = await BarcodeScanner.scan();
       print('QR code = $qrString');
       if (qrString != null) {
         decodeQRcode(qrString);
@@ -773,7 +773,7 @@ class _DetailCartState extends State<DetailCart> {
     }
   }
 
-  Future<void> decodeQRcode(String code) async {
+  Future<void> decodeQRcode(var code) async {
     try {
       String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
       http.Response response = await http.get(url);

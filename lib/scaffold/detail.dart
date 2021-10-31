@@ -147,11 +147,13 @@ class _DetailState extends State<Detail> {
   Widget showCarouseSliderRelate() {
     return GestureDetector(
       child: CarouselSlider.builder(
-        pauseAutoPlayOnTouch: Duration(seconds: 5),
-        autoPlay: true,
-        autoPlayAnimationDuration: Duration(seconds: 5),
+        options: CarouselOptions(
+          // pauseAutoPlayOnTouch: Duration(seconds: 5),
+          autoPlay: true,
+          autoPlayAnimationDuration: Duration(seconds: 5),
+        ),
         itemCount: (relateModels.length / 2).round(),
-        itemBuilder: (context, index) {
+        itemBuilder: (context, index, realIdx) {
           final int first = index * 2;
           final int second = first + 1;
 

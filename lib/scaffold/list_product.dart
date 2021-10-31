@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:barcode_scan/barcode_scan.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:http/http.dart' as http;
 import 'package:somsakpharma/models/product_all_model.dart';
 import 'package:somsakpharma/models/user_model.dart';
@@ -16,6 +16,12 @@ import 'detail_cart.dart';
 import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:flutter/cupertino.dart';
+
+import 'package:flutter/services.dart';
+
+import 'package:permission_handler/permission_handler.dart';
+import 'package:scan_preview/scan_preview_widget.dart';
+import 'package:flutter/foundation.dart';
 
 class ListProduct extends StatefulWidget {
   final int index;
@@ -53,7 +59,7 @@ class _ListProductState extends State<ListProduct> {
   int amontCart = 0;
   UserModel myUserModel;
   String searchString = '';
-  String qrString;
+  var qrString;
   int amountListView = 6, page = 1;
   ScrollController scrollController = ScrollController();
   final Debouncer debouncer =
@@ -503,6 +509,25 @@ class _ListProductState extends State<ListProduct> {
     }
   }
 
+  Future<void> readQRcodePreview() async {
+    try {
+      final qrScanString = await Navigator.push(this.context,
+          MaterialPageRoute(builder: (context) => ScanPreviewPage()));
+
+      print('Before scan');
+      // final qrScanString = await BarcodeScanner.scan();
+      print('After scan');
+      print('scanl result: $qrScanString');
+      qrString = qrScanString;
+      if (qrString != null) {
+        decodeQRcode(qrString);
+      }
+      // setState(() => scanResult = qrScanString);
+    } on PlatformException catch (e) {
+      print('e = $e');
+    }
+  }
+
   BottomNavigationBarItem homeBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.home),
@@ -615,11 +640,45 @@ class _ListProductState extends State<ListProduct> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          readQRcode();
+          // readQRcode();
+          readQRcodePreview();
         },
         icon: Icon(Icons.camera_alt),
         label: Text('Scan'),
         backgroundColor: Colors.green,
+      ),
+    );
+  }
+}
+
+class ScanPreviewPage extends StatefulWidget {
+  @override
+  _ScanPreviewPageState createState() => _ScanPreviewPageState();
+}
+
+class _ScanPreviewPageState extends State<ScanPreviewPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Somsak Pharma'),
+        ),
+        body: SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: ScanPreviewWidget(
+            onScanResult: (result) {
+              debugPrint('scan result: $result');
+              Navigator.pop(context, result);
+            },
+          ),
+        ),
       ),
     );
   }

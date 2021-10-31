@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:barcode_scan/barcode_scan.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:somsakpharma/models/product_all_model.dart';
@@ -17,6 +17,12 @@ import 'package:somsakpharma/widget/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail_cart.dart';
+
+import 'package:flutter/services.dart';
+
+import 'package:permission_handler/permission_handler.dart';
+import 'package:scan_preview/scan_preview_widget.dart';
+import 'package:flutter/foundation.dart';
 
 class MyService extends StatefulWidget {
   final UserModel userModel;
@@ -120,18 +126,36 @@ class _MyServiceState extends State<MyService> {
         Icons.photo_camera,
         size: 36.0,
       ),
-      title: Text('Read QR code'),
-      subtitle: Text('Read QR code or barcode'),
+      title: Text('Scan barcode'),
+      subtitle: Text('Scan QR code or barcode'),
       onTap: () {
-        readQRcode();
-        Navigator.of(context).pop();
+        // readQRcode();
+        readQRcodePreview();
+        // Navigator.of(context).pop();
       },
     );
   }
 
+  Future<void> readQRcodePreview() async {
+    try {
+      print('Before scan');
+      final qrScanString = await Navigator.push(this.context,
+          MaterialPageRoute(builder: (context) => ScanPreviewPage()));
+      print('After scan');
+      print('scanl result: $qrScanString');
+      qrString = qrScanString;
+      if (qrString != null) {
+        decodeQRcode(qrString);
+      }
+      // setState(() => scanResult = qrScanString);
+    } on PlatformException catch (e) {
+      print('e = $e');
+    }
+  }
+
   Future<void> readQRcode() async {
     try {
-      qrString = await BarcodeScanner.scan();
+      var qrString = await BarcodeScanner.scan();
       print('QR code = $qrString');
       if (qrString != null) {
         decodeQRcode(qrString);
@@ -141,7 +165,7 @@ class _MyServiceState extends State<MyService> {
     }
   }
 
-  Future<void> decodeQRcode(String code) async {
+  Future<void> decodeQRcode(var code) async {
     try {
       String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
       http.Response response = await http.get(url);
@@ -371,6 +395,39 @@ class _MyServiceState extends State<MyService> {
       ),
       body: currentWidget,
       drawer: showDrawer(),
+    );
+  }
+}
+
+class ScanPreviewPage extends StatefulWidget {
+  @override
+  _ScanPreviewPageState createState() => _ScanPreviewPageState();
+}
+
+class _ScanPreviewPageState extends State<ScanPreviewPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Somsak Pharma'),
+        ),
+        body: SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: ScanPreviewWidget(
+            onScanResult: (result) {
+              debugPrint('scan result: $result');
+              Navigator.pop(context, result);
+            },
+          ),
+        ),
+      ),
     );
   }
 }

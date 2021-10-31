@@ -23,21 +23,25 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.3
-  http: ^0.13.4
+  http: ^0.12.0+2
   carousel_slider: ^4.0.0
-  #carousel_slider: ^2.2.1
-  barcode_scan: ^3.0.1
-  shared_preferences: ^2.0.8
+  # carousel_slider: ^2.2.1
+  # barcode_scan: ^3.0.1
+  shared_preferences: ^0.5.4+6
   flutter_webview_plugin: ^0.4.0
   flutter_spinbox: ^0.6.0
   loading: ^1.0.2
   loadmore: ^2.0.1
   rflutter_alert: ^2.0.4
+  barcode_scan2: ^4.1.4
+  permission_handler: ^5.0.0
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  scan_preview:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

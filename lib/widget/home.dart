@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:barcode_scan/barcode_scan.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
 import 'package:somsakpharma/models/product_all_model.dart';
 import 'package:somsakpharma/models/promote_model.dart';
 import 'package:somsakpharma/models/user_model.dart';
@@ -15,6 +14,18 @@ import 'package:somsakpharma/scaffold/list_product.dart';
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+
+import 'dart:async';
+import 'dart:io' show Platform;
+import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:somsakpharma/widget/scan.dart';
+
+import 'package:permission_handler/permission_handler.dart';
+import 'package:scan_preview/scan_preview_widget.dart';
+import 'package:flutter/foundation.dart';
 
 class Home extends StatefulWidget {
   final UserModel userModel;
@@ -40,6 +51,7 @@ class _HomeState extends State<Home> {
   List<ProductAllModel> suggestModels = List();
   String qrString;
   int currentIndex = 0;
+  String _result = '';
 
   // Method
   @override
@@ -48,6 +60,11 @@ class _HomeState extends State<Home> {
     readPromotion();
     myUserModel = widget.userModel;
     readSuggest();
+    _requestPermission();
+  }
+
+  _requestPermission() async {
+    await Permission.camera.request();
   }
 
   Future<void> readPromotion() async {
@@ -117,75 +134,79 @@ class _HomeState extends State<Home> {
         // Navigator.of(context).push(route).then((value) {});  //  link to detail page
       },
       child: CarouselSlider(
-        height: 1200,
-        viewportFraction: 0.8,
-        enlargeCenterPage: true,
-        aspectRatio: 16 / 9,
-        pauseAutoPlayOnTouch: Duration(seconds: 5),
-        autoPlay: true,
-        autoPlayAnimationDuration: Duration(seconds: 5),
+        options: CarouselOptions(
+          height: 1200,
+          viewportFraction: 0.8,
+          enlargeCenterPage: true,
+          aspectRatio: 16 / 9,
+          // pauseAutoPlayOnTouch: Duration(seconds: 5),
+          autoPlay: true,
+          autoPlayAnimationDuration: Duration(seconds: 5),
+          onPageChanged: (int index, reason) {
+            banerIndex = index;
+            Text('x');
+            // print('index = $index');
+          },
+        ),
         items: promoteLists,
-        onPageChanged: (int index) {
-          banerIndex = index;
-          Text('x');
-          // print('index = $index');
-        },
       ),
     );
   }
 
   Widget showCarouseSliderSuggest() {
-    //  return GestureDetector(
-    //   child: CarouselSlider.builder(
-    //     pauseAutoPlayOnTouch: Duration(seconds: 5),
-    //     autoPlay: true,
-    //     autoPlayAnimationDuration: Duration(seconds: 5),
-    //     itemCount: (suggestLists.length / 2).round(),
-    //     itemBuilder: (context, index) {
-    //       final int first = index * 2;
-    //       final int second = first + 1;
+    return GestureDetector(
+      child: CarouselSlider.builder(
+        options: CarouselOptions(
+          // pauseAutoPlayOnTouch: Duration(seconds: 5),
+          autoPlay: true,
+          autoPlayAnimationDuration: Duration(seconds: 5),
+        ),
+        itemCount: (suggestLists.length / 2).round(),
+        itemBuilder: (context, index, realIdx) {
+          final int first = index * 2;
+          final int second = first + 1;
 
-    //       return Row(
-    //         children: [first, second].map((idx) {
-    //           return Expanded(
-    //             child: GestureDetector(
-    //                 child: Card(
-    //               // flex: 1,
-    //               child: Column(
-    //                 children: <Widget>[
-    //                   Container(
-    //                     // width: MediaQuery.of(context).size.width * 0.50,
-    //                     height: 100.00,
-    //                     child: suggestLists[idx],
-    //                     padding: EdgeInsets.all(8.0),
-    //                   ),
-    //                   Text(
-    //                     productsName[idx].toString(),
-    //                     style: TextStyle(
-    //                         fontSize: 14,
-    //                         fontWeight: FontWeight.bold,
-    //                         color: Colors.green),
-    //                   ),
-    //                 ],
-    //               ),
-    //             ),
-    //               onTap: () {
-    //                 print('You Click index >> $idx');
-    //                 MaterialPageRoute route = MaterialPageRoute(
-    //                   builder: (BuildContext context) => Detail(
-    //                     productAllModel: suggestModels[idx],
-    //                     userModel: myUserModel,
-    //                   ),
-    //                 );
-    //                 Navigator.of(context).push(route).then((value) {});
-    //               },
-    //             ),
-    //           );
-    //         }).toList(),
-    //       );
-    //     },
-    //   ),
-    // );
+          return Row(
+            children: [first, second].map((idx) {
+              return Expanded(
+                child: GestureDetector(
+                  child: Card(
+                    // flex: 1,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          // width: MediaQuery.of(context).size.width * 0.50,
+                          height: 100.00,
+                          child: suggestLists[idx],
+                          padding: EdgeInsets.all(8.0),
+                        ),
+                        Text(
+                          productsName[idx].toString(),
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green),
+                        ),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    print('You Click index >> $idx');
+                    MaterialPageRoute route = MaterialPageRoute(
+                      builder: (BuildContext context) => Detail(
+                        productAllModel: suggestModels[idx],
+                        userModel: myUserModel,
+                      ),
+                    );
+                    Navigator.of(context).push(route).then((value) {});
+                  },
+                ),
+              );
+            }).toList(),
+          );
+        },
+      ),
+    );
 
     return GestureDetector(
       onTap: () {
@@ -200,11 +221,17 @@ class _HomeState extends State<Home> {
         Navigator.of(context).push(route).then((value) {});
       },
       child: CarouselSlider(
-        enlargeCenterPage: true,
-        aspectRatio: 16 / 9,
-        pauseAutoPlayOnTouch: Duration(seconds: 5),
-        autoPlay: true,
-        autoPlayAnimationDuration: Duration(seconds: 5),
+        options: CarouselOptions(
+          enlargeCenterPage: true,
+          aspectRatio: 16 / 9,
+          // pauseAutoPlayOnTouch: Duration(seconds: 5),
+          autoPlay: true,
+          autoPlayAnimationDuration: Duration(seconds: 5),
+          onPageChanged: (int index, reason) {
+            suggessIndex = index;
+            // print('index = $index');
+          },
+        ),
         items: suggestLists
             .map((item) => Container(
                   child: Center(
@@ -229,10 +256,6 @@ class _HomeState extends State<Home> {
                   // color: Colors.grey.shade200,
                 ))
             .toList(),
-        onPageChanged: (int index) {
-          suggessIndex = index;
-          // print('index = $index');
-        },
       ),
     );
   }
@@ -452,7 +475,8 @@ class _HomeState extends State<Home> {
         ),
         onTap: () {
           print('You click barcode scan');
-          readQRcode();
+          // readQRcode();
+          readQRcodePreview();
           // Navigator.of(context).pop();
         },
       ),
@@ -499,6 +523,89 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget scanPreview() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.45,
+      // height: 80.0,
+      child: GestureDetector(
+        child: Card(
+          // color: Colors.green.shade100,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            alignment: AlignmentDirectional(0.0, 0.0),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: 45.0,
+                  child: Image.asset('images/icon_history.png'),
+                ),
+                Text(
+                  'scan preview',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
+        onTap: () async {
+          // final result = await Navigator.push(this.context,
+          //     MaterialPageRoute(builder: (context) => ScanPreviewPage()));
+          // setState(() {
+          //   _result = result;
+          // });
+          // print('scanl result: $_result');
+          print('You click scan preview');
+
+          readQRcodePreview();
+        },
+      ),
+    );
+  }
+
+  Widget scanBTN() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.45,
+      // height: 80.0,
+      child: GestureDetector(
+        child: Card(
+          // color: Colors.green.shade100,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            alignment: AlignmentDirectional(0.0, 0.0),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: 45.0,
+                  child: Image.asset('images/icon_history.png'),
+                ),
+                Text(
+                  'scan',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
+        onTap: () {
+          print('You click scan');
+          MaterialPageRoute materialPageRoute =
+              MaterialPageRoute(builder: (BuildContext buildContext) {
+            return Scan(
+                // userModel: myUserModel,
+                );
+          });
+          Navigator.of(context).push(materialPageRoute);
+        },
+      ),
+    );
+  }
+
   Widget bottomMenu() {
     return Row(
       // mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -519,6 +626,18 @@ class _HomeState extends State<Home> {
       children: <Widget>[
         topLeft(),
         topRight(),
+      ],
+    );
+  }
+
+  Widget scanMenu() {
+    return Row(
+      // mainAxisAlignment: MainAxisAlignment.spaceAround,
+      // mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        scanBTN(),
+        scanPreview(),
       ],
     );
   }
@@ -547,12 +666,35 @@ class _HomeState extends State<Home> {
 
   Future<void> readQRcode() async {
     try {
-      qrString = await BarcodeScanner.scan();
-      print('QR code = $qrString');
+      print('Before scan');
+      final qrScanString = await BarcodeScanner.scan();
+      print('After scan');
+      print('scan result = ' + qrScanString.rawContent);
+      qrString = qrScanString.rawContent;
       if (qrString != null) {
         decodeQRcode(qrString);
       }
-    } catch (e) {
+      // setState(() => scanResult = qrScanString);
+    } on PlatformException catch (e) {
+      print('e = $e');
+    }
+  }
+
+  Future<void> readQRcodePreview() async {
+    try {
+      final qrScanString = await await Navigator.push(this.context,
+          MaterialPageRoute(builder: (context) => ScanPreviewPage()));
+
+      print('Before scan');
+      // final qrScanString = await BarcodeScanner.scan();
+      print('After scan');
+      print('scanl result: $qrScanString');
+      qrString = qrScanString;
+      if (qrString != null) {
+        decodeQRcode(qrString);
+      }
+      // setState(() => scanResult = qrScanString);
+    } on PlatformException catch (e) {
       print('e = $e');
     }
   }
@@ -603,6 +745,7 @@ class _HomeState extends State<Home> {
           topMenu(),
           // mySizebox(),
           bottomMenu(),
+          // scanMenu(),
         ],
       ),
     );
@@ -726,6 +869,39 @@ class _WebViewState extends State<WebView> {
       withLocalStorage: true,
       appCacheEnabled: false,
       ignoreSSLErrors: true,
+    );
+  }
+}
+
+class ScanPreviewPage extends StatefulWidget {
+  @override
+  _ScanPreviewPageState createState() => _ScanPreviewPageState();
+}
+
+class _ScanPreviewPageState extends State<ScanPreviewPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Somsak Pharma'),
+        ),
+        body: SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: ScanPreviewWidget(
+            onScanResult: (result) {
+              debugPrint('scan result: $result');
+              Navigator.pop(context, result);
+            },
+          ),
+        ),
+      ),
     );
   }
 }
