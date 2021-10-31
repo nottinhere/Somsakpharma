@@ -682,7 +682,7 @@ class _HomeState extends State<Home> {
 
   Future<void> readQRcodePreview() async {
     try {
-      final qrScanString = await await Navigator.push(this.context,
+      final qrScanString = await Navigator.push(this.context,
           MaterialPageRoute(builder: (context) => ScanPreviewPage()));
 
       print('Before scan');
@@ -890,6 +890,7 @@ class _ScanPreviewPageState extends State<ScanPreviewPage> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Somsak Pharma'),
+          backgroundColor: MyStyle().textColor,
         ),
         body: SizedBox(
           width: double.infinity,

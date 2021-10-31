@@ -668,6 +668,7 @@ class _ScanPreviewPageState extends State<ScanPreviewPage> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Somsak Pharma'),
+          backgroundColor: MyStyle().textColor,
         ),
         body: SizedBox(
           width: double.infinity,
