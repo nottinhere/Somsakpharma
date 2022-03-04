@@ -28,6 +28,17 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSContactsUsageDescription</key>
+    <string>You have to describe the real usage for a human.</string>
+	<key>NSCalendarsUsageDescription</key>
+    <string>You have to describe the real usage for a human.</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Play using while you are hiking</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app needs to be able to access your motion use</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>recognize speech</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

@@ -215,14 +215,14 @@ class _ListProductState extends State<ListProduct> {
         children: <Widget>[
           Text(
             'Stock : ',
-            style: MyStyle().h3Style,
+            style: MyStyle().h4Style,
           ),
           Text(
             '${filterProductAllModels[index].stock.toString()}',
             style: TextStyle(
                 color: Colors.grey.shade600,
                 fontWeight: FontWeight.normal,
-                fontSize: 16.00),
+                fontSize: 13.00),
           ),
         ],
       );
@@ -231,14 +231,14 @@ class _ListProductState extends State<ListProduct> {
         children: <Widget>[
           Text(
             'Stock : ',
-            style: MyStyle().h3Style,
+            style: MyStyle().h4Style,
           ),
           Text(
             '${filterProductAllModels[index].stock.toString()}',
             style: TextStyle(
                 color: Colors.blue.shade900,
                 fontWeight: FontWeight.normal,
-                fontSize: 16.00),
+                fontSize: 13.00),
           ),
         ],
       );
@@ -252,7 +252,7 @@ class _ListProductState extends State<ListProduct> {
       children: <Widget>[
         Text(
           'ราคา : ${filterProductAllModels[index].itemprice.toString()}/${filterProductAllModels[index].itemunit.toString()}',
-          style: MyStyle().h3Style,
+          style: MyStyle().h3bStyle,
         ),
       ],
     );

@@ -163,11 +163,13 @@ class _HomeState extends State<Home> {
         ),
         itemCount: (suggestLists.length / 2).round(),
         itemBuilder: (context, index, realIdx) {
-          final int first = index * 2;
-          final int second = first + 1;
+          final int first = index;
+//          final int first = index * 2;
+//          final int second = first + 1;
 
           return Row(
-            children: [first, second].map((idx) {
+            children: [first].map((idx) {
+              //  [first, second]
               return Expanded(
                 child: GestureDetector(
                   child: Card(

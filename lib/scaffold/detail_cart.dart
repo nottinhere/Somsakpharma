@@ -276,15 +276,18 @@ class _DetailCartState extends State<DetailCart> {
     String memberID = myUserModel.id.toString();
 
     // print('$index - $quantity');
-    return SpinBox(
-        value: (quantity).toDouble(),
-        min: 1,
-        onChanged: (changevalue) {
-          newQTY = (changevalue == 0) ? 0 : (changevalue).toDouble();
-          print(
-              'productID = $productID ,unitSize = $size ,memberID = $memberID, newQTY = $newQTY');
-          updateDetailCart(productID, size, memberID);
-        });
+    return SizedBox(
+      width: 140.0,
+      child: SpinBox(
+          value: (quantity).toDouble(),
+          min: 1,
+          onChanged: (changevalue) {
+            newQTY = (changevalue == 0) ? 0 : (changevalue).toDouble();
+            print(
+                'productID = $productID ,unitSize = $size ,memberID = $memberID, newQTY = $newQTY');
+            updateDetailCart(productID, size, memberID);
+          }),
+    );
   }
 
   Future<void> updateDetailCart(
@@ -467,14 +470,8 @@ class _DetailCartState extends State<DetailCart> {
                 '$price บาท/ $lable',
                 style: MyStyle().h3Style,
               ),
-              Text(
-                'จำนวน $quantity',
-                style: MyStyle().h3Style,
-              ),
-              editAndDeleteButton(index, 's'),
-              // Expanded(
-              //   child: changeQTY(productID, 's', showQTYS),
-              // ),
+              changeQTY(productID, 's', showQTYS),
+              deleteButton(index, 's'),
             ],
           );
   }

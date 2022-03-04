@@ -31,6 +31,12 @@ class MyStyle {
     color: Color.fromARGB(0xff, 0x00, 0x73, 0x26),
   );
 
+  TextStyle h4Style = TextStyle(
+    fontSize: 12.0,
+    // fontWeight: FontWeight.bold,
+    color: Color.fromARGB(0xff, 0x00, 0x73, 0x26),
+  );
+
   BoxDecoration boxLightGreen = BoxDecoration(
     borderRadius: BorderRadius.circular(12.0),
     color: Color.fromARGB(0x68, 0x00, 0xd5, 0x7f),
@@ -42,11 +48,11 @@ class MyStyle {
   );
 
   Widget mySizebox() {
-  return SizedBox(
-    width: 10.0,
-    height: 16.0,
-  );
-}
+    return SizedBox(
+      width: 10.0,
+      height: 16.0,
+    );
+  }
 
   String fontName = 'Sarabun';
 
