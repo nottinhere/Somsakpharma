@@ -83,11 +83,15 @@ class _AuthenState extends State<Authen> {
   Widget loginButton() {
     return Container(
       width: 250.0,
-      child: RaisedButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+      child: ElevatedButton(
+        // shape: RoundedRectangleBorder(
+        //   borderRadius: BorderRadius.circular(12.0),
+        // ),
+        style: ElevatedButton.styleFrom(
+          primary: MyStyle()
+              .textColor, // Sets color for all the descendent ElevatedButtons
         ),
-        color: MyStyle().textColor,
+        // color: MyStyle().textColor,
         child: Text('Login',
             style: TextStyle(
               color: Colors.white,
@@ -126,7 +130,7 @@ class _AuthenState extends State<Authen> {
       normalDialog(context, 'ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลให้ครบ');
     } else {
       String urlPop = 'http://somsakpharma.com/api/json_popup.php';
-      http.Response responsePop = await http.get(urlPop);
+      http.Response responsePop = await http.get(Uri.parse(urlPop));
       var resultPop = json.decode(responsePop.body);
       var mapItemPopup = resultPop[
           'itemsData']; // dynamic    จะส่ง value อะไรก็ได้ รวมถึง null
@@ -147,8 +151,8 @@ class _AuthenState extends State<Authen> {
       // No space
       String url =
           '${MyStyle().getUserWhereUserAndPass}?username=$user&password=$password';
-      http.Response response = await http
-          .get(url); // await จะต้องทำงานใน await จะเสร็จจึงจะไปทำ process ต่อไป
+      http.Response response = await http.get(Uri.parse(
+          url)); // await จะต้องทำงานใน await จะเสร็จจึงจะไปทำ process ต่อไป
       print('url = $url');
 
       var result = json.decode(response.body);
@@ -178,7 +182,7 @@ class _AuthenState extends State<Authen> {
   }
 
   Widget okButtonLogin(BuildContext buildContext) {
-    return FlatButton(
+    return TextButton(
       child: Text('OK'),
       onPressed: () {
         // Navigator.of(buildContext).pop();  // pop คือการทำให้มันหายไป
@@ -459,7 +463,7 @@ class _WebViewWidgetState extends State {
           child: Column(
             children: [
               Container(
-                child: FlatButton(
+                child: TextButton(
                     child: Text("Open my Blog"),
                     onPressed: () {
                       print("in");

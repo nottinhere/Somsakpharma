@@ -71,7 +71,7 @@ class _DetailCartState extends State<DetailCart> {
     String url = '${MyStyle().loadMyCart}$memberId';
     print('url Detail Cart ====>>>>> $url');
 
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(Uri.parse(url));
     var result = json.decode(response.body);
     var cartList = result['cart'];
     // print('cartList =======>>> $cartList');
@@ -264,10 +264,20 @@ class _DetailCartState extends State<DetailCart> {
     // );
 
     return SpinBox(
+        min: 1,
+        max: 10000,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(0),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.cyan),
+          ),
+        ),
         value: (quantity).toDouble(),
         onChanged: (changevalue) {
           newQTY = (changevalue == 0) ? 0 : (changevalue).toDouble();
         }
+
         // decoration: InputDecoration(labelText: 'Decimals'),
         );
   }
@@ -281,6 +291,14 @@ class _DetailCartState extends State<DetailCart> {
       child: SpinBox(
           value: (quantity).toDouble(),
           min: 1,
+          max: 10000,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.all(0),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.cyan),
+            ),
+          ),
           onChanged: (changevalue) {
             newQTY = (changevalue == 0) ? 0 : (changevalue).toDouble();
             print(
@@ -295,10 +313,10 @@ class _DetailCartState extends State<DetailCart> {
     String url =
         'http://somsakpharma.com/api/json_updatemycart.php?productID=$productID&unitSize=$unitSize&newQTY=$newQTY&memberId=$memberID';
     print('url editDetailCart ====>>>>> $url');
-    await http.get(url).then((response) {});
+    await http.get(Uri.parse(url)).then((response) {});
 
     String url2 = '${MyStyle().loadMyCart}$memberID';
-    http.Response response = await http.get(url2);
+    http.Response response = await http.get(Uri.parse(url2));
     var result = json.decode(response.body);
     var cartList = result['cart'];
 
@@ -353,7 +371,7 @@ class _DetailCartState extends State<DetailCart> {
     String unitSize = size;
     String memberID = myUserModel.id.toString();
 
-    return FlatButton(
+    return TextButton(
       child: Text('OK'),
       onPressed: () {
         print(
@@ -372,7 +390,7 @@ class _DetailCartState extends State<DetailCart> {
 
     print('url editDetailCart ====>>>>> $url');
 
-    await http.get(url).then((response) {
+    await http.get(Uri.parse(url)).then((response) {
       setState(() {
         readCart();
       });
@@ -380,7 +398,7 @@ class _DetailCartState extends State<DetailCart> {
   }
 
   Widget cancelButton() {
-    return FlatButton(
+    return TextButton(
       child: Text('Cancel'),
       onPressed: () {
         Navigator.of(context).pop();
@@ -415,7 +433,7 @@ class _DetailCartState extends State<DetailCart> {
   }
 
   Widget comfirmButton(int index, String size) {
-    return FlatButton(
+    return TextButton(
       child: Text('Confirm'),
       onPressed: () {
         deleteCart(index, size);
@@ -435,7 +453,7 @@ class _DetailCartState extends State<DetailCart> {
         'http://somsakpharma.com/api/json_removeitemincart.php?productID=$productID&unitSize=$unitSize&memberId=$memberID';
     print('url DeleteCart#######################======>>>> $url');
 
-    await http.get(url).then((response) {
+    await http.get(Uri.parse(url)).then((response) {
       setState(() {
         readCart();
       });
@@ -635,8 +653,11 @@ class _DetailCartState extends State<DetailCart> {
       children: <Widget>[
         Container(
           margin: EdgeInsets.only(right: 30.0),
-          child: RaisedButton(
-            color: MyStyle().textColor,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: MyStyle()
+                  .textColor, // Sets color for all the descendent ElevatedButtons
+            ),
             onPressed: () {
               if (transport == null) {
                 normalDialog(context, 'ยังไม่เลือก  การจัดส่ง',
@@ -664,7 +685,7 @@ class _DetailCartState extends State<DetailCart> {
       String url =
           'http://somsakpharma.com/api/json_submit_myorder.php?memberId=$memberID&transport=$transport&comment=$comment';
 
-      await http.get(url).then((value) {
+      await http.get(Uri.parse(url)).then((value) {
         confirmSubmit();
       });
     } catch (e) {}
@@ -678,7 +699,7 @@ class _DetailCartState extends State<DetailCart> {
             title: Text('Complete'),
             content: Text('การสั่งซื้อเรียบร้อย'),
             actions: <Widget>[
-              FlatButton(
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     backProcess();
@@ -696,28 +717,28 @@ class _DetailCartState extends State<DetailCart> {
   BottomNavigationBarItem homeBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.home),
-      title: Text('Home'),
+      label: 'Home',
     );
   }
 
   BottomNavigationBarItem productBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.medical_services),
-      title: Text('Product'),
+      label: 'Product',
     );
   }
 
   BottomNavigationBarItem cartBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.shopping_cart),
-      title: Text('Cart'),
+      label: 'Cart',
     );
   }
 
   BottomNavigationBarItem readQrBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.camera_alt),
-      title: Text('Barcode Scan'),
+      label: 'Barcode Scan',
     );
   }
 
@@ -773,7 +794,7 @@ class _DetailCartState extends State<DetailCart> {
   Future<void> decodeQRcode(var code) async {
     try {
       String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
-      http.Response response = await http.get(url);
+      http.Response response = await http.get(Uri.parse(url));
       var result = json.decode(response.body);
       print('result ===*******>>>> $result');
 

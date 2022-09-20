@@ -34,7 +34,7 @@ class _ScanState extends State<Scan> {
       body: Center(
         child: Column(
           children: <Widget>[
-            RaisedButton(
+            ElevatedButton(
               child: Text('start scan'),
               onPressed: () async {
                 final result = await Navigator.push(this.context,

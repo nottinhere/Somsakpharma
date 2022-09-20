@@ -168,7 +168,7 @@ class _MyServiceState extends State<MyService> {
   Future<void> decodeQRcode(var code) async {
     try {
       String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
-      http.Response response = await http.get(url);
+      http.Response response = await http.get(Uri.parse(url));
       var result = json.decode(response.body);
       print('result ===*******>>>> $result');
 
@@ -269,7 +269,7 @@ class _MyServiceState extends State<MyService> {
     String url =
         'http://somsakpharma.com/api/json_loadmycart.php?memberId=$memberId';
 
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(Uri.parse(url));
     var result = json.decode(response.body);
     var cartList = result['cart'];
 
@@ -335,28 +335,28 @@ class _MyServiceState extends State<MyService> {
   BottomNavigationBarItem homeBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.home),
-      title: Text('Home'),
+      label: 'Home',
     );
   }
 
   BottomNavigationBarItem productBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.medical_services),
-      title: Text('Product'),
+      label: 'Product',
     );
   }
 
   BottomNavigationBarItem cartBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.shopping_cart),
-      title: Text('Cart'),
+      label: 'Cart',
     );
   }
 
   BottomNavigationBarItem readQrBotton() {
     return BottomNavigationBarItem(
       icon: Icon(Icons.camera_alt),
-      title: Text('Barcode Scan'),
+      label: 'Barcode Scan',
     );
   }
 

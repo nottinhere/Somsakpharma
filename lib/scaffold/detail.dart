@@ -72,7 +72,7 @@ class _DetailState extends State<Detail> {
       id = currentProductAllModel.id.toString();
       String url = '${MyStyle().getProductWhereId}$id&memberId=$memberId';
       print('url Detaillll ====>>> $url');
-      http.Response response = await http.get(url);
+      http.Response response = await http.get(Uri.parse(url));
       var result = json.decode(response.body);
       print('result =0000000>>> $result');
 
@@ -125,7 +125,7 @@ class _DetailState extends State<Detail> {
         'http://www.somsakpharma.com/api/json_relate.php?productId=$id'; // ?memberId=$memberId
 
     print('URL relate >> $url');
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(Uri.parse(url));
     var result = json.decode(response.body);
     var mapItemProduct =
         result['itemsProduct']; // dynamic    จะส่ง value อะไรก็ได้ รวมถึง null
@@ -304,6 +304,16 @@ class _DetailState extends State<Detail> {
           // ),
           Padding(
             child: SpinBox(
+              min: 0,
+              max: 10000,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.all(0),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.cyan),
+                ),
+              ),
+
               value: (iniValue)
                   .toDouble(), //(iniValue == 0) ? 0 : (iniValue).toInt(),
               onChanged: (changevalue) {
@@ -461,7 +471,7 @@ class _DetailState extends State<Detail> {
 
     print('url Detail =====>>>>>>>> $url');
 
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(Uri.parse(url));
     var result = json.decode(response.body);
     var cartList = result['cart'];
     var thisproductID = id;
@@ -559,8 +569,12 @@ class _DetailState extends State<Detail> {
         Row(
           children: <Widget>[
             Expanded(
-              child: RaisedButton(
-                color: MyStyle().mainColor,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: MyStyle()
+                      .mainColor, // Sets color for all the descendent ElevatedButtons
+                ),
+                // color: MyStyle().mainColor,
                 child: Text(
                   'Add to Cart',
                   style: TextStyle(
@@ -642,7 +656,7 @@ class _DetailState extends State<Detail> {
     String url =
         'http://www.somsakpharma.com/api/json_savemycart.php?productID=$productID&unitSize=$unitSize&QTY=$qTY&memberId=$memberID';
 
-    http.Response response = await http.get(url).then((response) {
+    http.Response response = await http.get(Uri.parse(url)).then((response) {
       print('upload ok');
       // MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext buildContext){return DetailCart(userModel: myUserModel,);});
       Navigator.pop(context, true);
