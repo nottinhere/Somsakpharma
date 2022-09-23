@@ -33,7 +33,7 @@ dependencies:
   loading: ^1.0.2
   loadmore: ^2.0.1
   rflutter_alert: ^2.0.4
-  barcode_scan2: ^4.1.4
+  barcode_scan2: ^4.2.1
   permission_handler: ^10.0.0
   platform: ^3.1.0
 
