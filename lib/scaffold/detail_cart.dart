@@ -74,7 +74,7 @@ class _DetailCartState extends State<DetailCart> {
     http.Response response = await http.get(Uri.parse(url));
     var result = json.decode(response.body);
     var cartList = result['cart'];
-    // print('cartList =======>>> $cartList');
+    //  print('cartList =======>>> $cartList');
 
     for (var map in cartList) {
       ProductAllModel2 productAllModel = ProductAllModel2.fromJson(map);

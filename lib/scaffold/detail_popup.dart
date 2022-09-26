@@ -61,7 +61,7 @@ class _DetailState extends State<DetailPopup> {
       String postdate = popupModel.postdate;
       String detail = popupModel.detail;
       setState(() {
-        //promoteModels.add(promoteModel); // push ค่าลง arra
+        //promoteModels.add(promoteModel); //  push ค่าลง arra
         subjectPopup = subject;
         imagePopup = urlImage;
         detailPopup = detail;

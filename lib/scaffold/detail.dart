@@ -106,7 +106,7 @@ class _DetailState extends State<Detail> {
           print('sizeSmap = $sizeSmap');
           print('sizeMmap = $sizeMmap');
           print('sizeLmap = $sizeLmap');
-          // print('unitSizeModel = ${unitSizeModels[0].lable}');
+          //  print('unitSizeModel = ${unitSizeModels[0].lable}');
         });
       } // for
       setState(() {

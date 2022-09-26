@@ -105,7 +105,7 @@ class _HomeState extends State<Home> {
       String productName = promoteModel.title;
 
       setState(() {
-        //promoteModels.add(promoteModel); // push ค่าลง array
+        // promoteModels.add(promoteModel); // push ค่าลง array
         suggestModels.add(productAllModel);
         suggestLists.add(Image.network(urlImage));
         urlImagesSuggest.add(urlImage);

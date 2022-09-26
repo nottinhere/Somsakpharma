@@ -244,7 +244,7 @@ class _ListProductState extends State<ListProduct> {
       );
     }
 
-    // return Text('na');
+    //  return Text('na');
   }
 
   Widget showPrice(int index) {

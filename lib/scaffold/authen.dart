@@ -135,7 +135,7 @@ class _AuthenState extends State<Authen> {
       var mapItemPopup = resultPop[
           'itemsData']; // dynamic    จะส่ง value อะไรก็ได้ รวมถึง null
       for (var map in mapItemPopup) {
-        // PromoteModel promoteModel = PromoteModel.fromJson(map);
+        // PromoteModel promoteModel = PromoteModel.fromJson(map) ;
         PopupModel popupModel = PopupModel.fromJson(map);
         String urlImage = popupModel.photo;
         String subject = popupModel.subject;
