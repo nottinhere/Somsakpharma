@@ -366,6 +366,7 @@ class _ListProductState extends State<ListProduct> {
                     },
                   ),
                   myCircularProgress(),
+                  // LinearProgressIndicator(),
                 ],
               );
             }
