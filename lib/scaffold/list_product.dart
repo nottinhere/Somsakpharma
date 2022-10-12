@@ -16,9 +16,7 @@ import 'detail_cart.dart';
 import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:flutter/cupertino.dart';
-
 import 'package:flutter/services.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scan_preview/scan_preview_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -563,8 +561,7 @@ class _ListProductState extends State<ListProduct> {
       items: <BottomNavigationBarItem>[
         homeBotton(),
         productBotton(),
-        cartBotton(),
-        // readQrBotton(),
+        productBotton(),
       ],
       onTap: (int index) {
         print('index =$index');
@@ -578,7 +575,6 @@ class _ListProductState extends State<ListProduct> {
           Navigator.of(context).pushAndRemoveUntil(route, (route) => false);
         } else if (index == 2) {
           routeToDetailCart();
-          // readQRcode();
         }
       },
     );
@@ -629,10 +625,6 @@ class _ListProductState extends State<ListProduct> {
           showCart(),
         ],
       ),
-      // body: filterProductAllModels.length == 0
-      //     ? showProgressIndicate()
-      //     : myLayout(),
-
       body: Column(
         children: <Widget>[
           searchForm(),
