@@ -16,7 +16,9 @@ import 'detail_cart.dart';
 import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/services.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scan_preview/scan_preview_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -72,7 +74,7 @@ class _ListProductState extends State<ListProduct> {
   void initState() {
     // auto load
     super.initState();
-    myIndex = widget.index;
+    myIndex = widget.index == 0 ? 1 : widget.index;
     myUserModel = widget.userModel;
 
     createController(); // เมื่อ scroll to bottom
@@ -156,18 +158,27 @@ class _ListProductState extends State<ListProduct> {
   }
 
   Future<void> readData() async {
+    String memberID = myUserModel.id.toString();
+
     print('Here is readdata function');
     setState(() {
       visible = true;
     });
     String url =
         'http://somsakpharma.com/api/json_product.php?searchKey=$searchString&page=$page';
-    if (myIndex != 0) {
-      url = '${MyStyle().readProductWhereMode}$myIndex';
+    if (myIndex == 1) {
+      url =
+          'http://somsakpharma.com/api/json_product.php?searchKey=$searchString&page=$page';
+    } else if (myIndex == 2) {
+      url =
+          'http://somsakpharma.com/api/json_product.php?mode=newproduct&searchKey=$searchString&page=$page';
+    } else if (myIndex == 3) {
+      url =
+          'http://somsakpharma.com/api/json_yourproduct.php?memberId=$memberID&searchKey=$searchString&page=$page';
     }
 
     http.Response response = await http.get(Uri.parse(url));
-    // print('url readData ##################+++++++++++>>> $url');
+    print('url ($myIndex) readData ##################+++++++++++>>> $url');
     var result = json.decode(response.body);
     // print('result = $result');
     // print('url ListProduct ====>>>> $url');
@@ -242,7 +253,7 @@ class _ListProductState extends State<ListProduct> {
       );
     }
 
-    //  return Text('na');
+    // return Text('na');
   }
 
   Widget showPrice(int index) {
@@ -508,6 +519,17 @@ class _ListProductState extends State<ListProduct> {
     }
   }
 
+  void routeToListProduct(int index) {
+    MaterialPageRoute materialPageRoute =
+        MaterialPageRoute(builder: (BuildContext buildContext) {
+      return ListProduct(
+        index: index,
+        userModel: myUserModel,
+      );
+    });
+    Navigator.of(context).push(materialPageRoute);
+  }
+
   Future<void> readQRcodePreview() async {
     try {
       final qrScanString = await Navigator.push(this.context,
@@ -534,10 +556,24 @@ class _ListProductState extends State<ListProduct> {
     );
   }
 
-  BottomNavigationBarItem productBotton() {
+  BottomNavigationBarItem productBotton(int index) {
     return BottomNavigationBarItem(
       icon: Icon(Icons.medical_services),
       label: 'Product',
+    );
+  }
+
+  BottomNavigationBarItem newproductBotton(int index) {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.fiber_new),
+      label: 'New item',
+    );
+  }
+
+  BottomNavigationBarItem youritemBotton(int index) {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.assignment_turned_in_sharp),
+      label: 'Recommend',
     );
   }
 
@@ -557,11 +593,15 @@ class _ListProductState extends State<ListProduct> {
 
   Widget showBottomBarNav() {
     return BottomNavigationBar(
-      currentIndex: 1,
+      type: BottomNavigationBarType.fixed,
+      currentIndex: myIndex,
       items: <BottomNavigationBarItem>[
         homeBotton(),
-        productBotton(),
-        productBotton(),
+        productBotton(1),
+        newproductBotton(2),
+        youritemBotton(3),
+        // cartBotton(),
+        // readQrBotton(),
       ],
       onTap: (int index) {
         print('index =$index');
@@ -573,8 +613,15 @@ class _ListProductState extends State<ListProduct> {
             ),
           );
           Navigator.of(context).pushAndRemoveUntil(route, (route) => false);
+        } else if (index == 1) {
+          routeToListProduct(1);
+          // readQRcode();
         } else if (index == 2) {
-          routeToDetailCart();
+          routeToListProduct(2);
+          // readQRcode();
+        } else if (index == 3) {
+          routeToListProduct(3);
+          // readQRcode();
         }
       },
     );
@@ -625,6 +672,10 @@ class _ListProductState extends State<ListProduct> {
           showCart(),
         ],
       ),
+      // body: filterProductAllModels.length == 0
+      //     ? showProgressIndicate()
+      //     : myLayout(),
+
       body: Column(
         children: <Widget>[
           searchForm(),
