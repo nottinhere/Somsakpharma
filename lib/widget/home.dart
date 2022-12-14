@@ -298,43 +298,6 @@ class _HomeState extends State<Home> {
     Navigator.of(context).push(materialPageRoute);
   }
 
-  Widget productBox() {
-    String login = myUserModel.name;
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.8,
-      // height: 80.0,
-      child: GestureDetector(
-        child: Card(
-          color: Colors.greenAccent.shade100, // Colors.grey.shade100,
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            alignment: AlignmentDirectional(0.0, 0.0),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: 45.0,
-                  child: Image.asset('images/icon_drugs.png'),
-                  padding: EdgeInsets.all(8.0),
-                ),
-                Text(
-                  'รายการสินค้า',
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-              ],
-            ),
-          ),
-        ),
-        onTap: () {
-          print('You click product');
-          routeToListProduct(0);
-        },
-      ),
-    );
-  }
-
   Widget orderhistoryBox() {
     String login = myUserModel.name;
     return Container(
@@ -372,7 +335,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget topLeft() {
+  Widget productBox() {
     return Container(
       width: MediaQuery.of(context).size.width * 0.45,
       // height: 80.0,
@@ -407,7 +370,147 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget topRight() {
+  Widget youritemBox() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.45,
+      // height: 80.0,
+      child: GestureDetector(
+        child: Card(
+          // color: Colors.green.shade100,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            alignment: AlignmentDirectional(0.0, 0.0),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: 45.0,
+                  child: Image.asset('images/icon_youritem.png'),
+                ),
+                Text(
+                  'สินค้าของคุณ',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
+        onTap: () {
+          print('You click promotion');
+          routeToListProduct(1);
+        },
+      ),
+    );
+  }
+
+  Widget bestsellerBox() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.45,
+      // height: 80.0,
+      child: GestureDetector(
+        child: Card(
+          // color: Colors.green.shade100,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            alignment: AlignmentDirectional(0.0, 0.0),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: 45.0,
+                  child: Image.asset('images/icon_bestseller.png'),
+                ),
+                Text(
+                  'สินค้าขายดี',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
+        onTap: () {
+          print('You click promotion');
+          routeToListProduct(2);
+        },
+      ),
+    );
+  }
+
+  Widget recommendBox() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.45,
+      // height: 80.0,
+      child: GestureDetector(
+        child: Card(
+          // color: Colors.green.shade100,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            alignment: AlignmentDirectional(0.0, 0.0),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: 45.0,
+                  child: Image.asset('images/icon_recommend.png'),
+                ),
+                Text(
+                  'สินค้าแนะนำ',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
+        onTap: () {
+          print('You click promotion');
+          routeToListProduct(3);
+        },
+      ),
+    );
+  }
+
+  Widget newproductBox() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.45,
+      // height: 80.0,
+      child: GestureDetector(
+        child: Card(
+          // color: Colors.green.shade100,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            alignment: AlignmentDirectional(0.0, 0.0),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: 45.0,
+                  child: Image.asset('images/icon_new.png'),
+                ),
+                Text(
+                  'สินค้าใหม่',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
+        onTap: () {
+          print('You click promotion');
+          routeToListProduct(4);
+        },
+      ),
+    );
+  }
+
+  Widget cartBox() {
     return Container(
       width: MediaQuery.of(context).size.width * 0.45,
       // height: 80.0,
@@ -448,7 +551,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget bottomLeft() {
+  Widget scanBox() {
     return Container(
       width: MediaQuery.of(context).size.width * 0.45,
       // height: 80.0,
@@ -485,7 +588,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget bottomRight() {
+  Widget historyBox() {
     return Container(
       width: MediaQuery.of(context).size.width * 0.45,
       // height: 80.0,
@@ -608,26 +711,50 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget bottomMenu() {
+  Widget row1Menu() {
     return Row(
       // mainAxisAlignment: MainAxisAlignment.spaceAround,
       // mainAxisSize: MainAxisSize.max,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        bottomLeft(),
-        bottomRight(),
+        productBox(),
+        cartBox(),
       ],
     );
   }
 
-  Widget topMenu() {
+  Widget row2Menu() {
     return Row(
       // mainAxisAlignment: MainAxisAlignment.spaceAround,
       // mainAxisSize: MainAxisSize.max,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        topLeft(),
-        topRight(),
+        youritemBox(),
+        bestsellerBox(),
+      ],
+    );
+  }
+
+  Widget row3Menu() {
+    return Row(
+      // mainAxisAlignment: MainAxisAlignment.spaceAround,
+      // mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        recommendBox(),
+        newproductBox(),
+      ],
+    );
+  }
+
+  Widget row4Menu() {
+    return Row(
+      // mainAxisAlignment: MainAxisAlignment.spaceAround,
+      // mainAxisSize: MainAxisSize.max,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        scanBox(),
+        historyBox(),
       ],
     );
   }
@@ -744,9 +871,13 @@ class _HomeState extends State<Home> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          topMenu(),
+          row1Menu(),
           // mySizebox(),
-          bottomMenu(),
+          row2Menu(),
+          // scanMenu(),
+          row3Menu(),
+          // scanMenu(),
+          row4Menu(),
           // scanMenu(),
         ],
       ),

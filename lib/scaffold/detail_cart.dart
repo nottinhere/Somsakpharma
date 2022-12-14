@@ -95,6 +95,8 @@ class _DetailCartState extends State<DetailCart> {
         // print('S is not null >> $priceSdisplay');
         PriceListModel priceListModel = PriceListModel.fromJson(sizeSmap);
         priceListSModels.add(priceListModel);
+        print(priceListModel.quantity);
+
         calculateTotal(priceListModel.price, priceListModel.quantity);
       }
 
@@ -496,7 +498,7 @@ class _DetailCartState extends State<DetailCart> {
 
   void calculateTotal(String price, String quantity) {
     double priceDou = double.parse(price);
-    print('price Dou ====>>>> $priceDou');
+    print('price Dou ====>>>> $priceDou ($quantity)');
     double quantityDou = double.parse(quantity);
     print('quantityDou ====>> $quantityDou');
     total = total + (priceDou * quantityDou);

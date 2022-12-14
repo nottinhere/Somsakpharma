@@ -66,6 +66,7 @@ class _ListProductState extends State<ListProduct> {
       Debouncer(milliseconds: 500); // ตั้งค่า เวลาที่จะ delay
   bool statusStart = true;
   bool visible = true;
+  int currentIndex;
 
   var _controller = TextEditingController();
 
@@ -74,8 +75,24 @@ class _ListProductState extends State<ListProduct> {
   void initState() {
     // auto load
     super.initState();
-    myIndex = widget.index == 0 ? 1 : widget.index;
+    myIndex = widget.index; //widget.index == 0 ? 1 : widget.index;
     myUserModel = widget.userModel;
+
+    if (myIndex == 0) {
+      currentIndex = 1;
+    } else if (myIndex == 1) {
+      currentIndex = 2;
+    } else if (myIndex == 2) {
+      currentIndex = 3;
+    } else if (myIndex == 3) {
+      currentIndex = 4;
+    } else if (myIndex == 4) {
+      currentIndex = 5;
+    } else if (myIndex == 5) {
+      currentIndex = 6;
+    } else if (myIndex == 6) {
+      currentIndex = 7;
+    }
 
     createController(); // เมื่อ scroll to bottom
 
@@ -118,7 +135,6 @@ class _ListProductState extends State<ListProduct> {
         amontCart++;
       });
     }
-    print('TotalItemInCart (read)>>$amontCart');
   }
 
   Widget showCart() {
@@ -160,21 +176,32 @@ class _ListProductState extends State<ListProduct> {
   Future<void> readData() async {
     String memberID = myUserModel.id.toString();
 
-    print('Here is readdata function');
+    print('Here is readdata function  ($myIndex)');
     setState(() {
       visible = true;
     });
     String url =
-        'http://somsakpharma.com/api/json_product.php?searchKey=$searchString&page=$page';
+        'http://somsakpharma.com/api/json_product.php?memberId=$memberID&searchKey=$searchString&page=$page';
     if (myIndex == 1) {
+      //  สินค้าของคุณ
       url =
-          'http://somsakpharma.com/api/json_product.php?searchKey=$searchString&page=$page';
+          'http://somsakpharma.com/api/json_product_youritem.php?memberId=$memberID&searchKey=$searchString&page=$page';
     } else if (myIndex == 2) {
+      //  สินค้าขายดี
       url =
-          'http://somsakpharma.com/api/json_product.php?mode=newproduct&searchKey=$searchString&page=$page';
+          'http://somsakpharma.com/api/json_product_bestseller.php?memberId=$memberID&searchKey=$searchString&page=$page';
     } else if (myIndex == 3) {
+      //  สินค้าแนะนำ
       url =
-          'http://somsakpharma.com/api/json_yourproduct.php?memberId=$memberID&searchKey=$searchString&page=$page';
+          'http://somsakpharma.com/api/json_product.php?memberId=$memberID&searchKey=$searchString&page=$page';
+    } else if (myIndex == 4) {
+      //  สินค้าใหม่
+      url =
+          'http://somsakpharma.com/api/json_product.php?memberId=$memberID&product_mode=new&searchKey=$searchString&page=$page';
+    } else if (myIndex == 5) {
+      //
+      url =
+          'http://somsakpharma.com/api/json_product.php?memberId=$memberID&searchKey=$searchString&page=$page';
     }
 
     http.Response response = await http.get(Uri.parse(url));
@@ -411,10 +438,6 @@ class _ListProductState extends State<ListProduct> {
   }
 
   Widget showContent() {
-    // readCart();
-    print('searchString (show content) ===>>> $searchString');
-    print('TotalItemInCart (content)>>$amontCart');
-
     bool searchKey;
     if (searchString != '') {
       searchKey = true;
@@ -426,8 +449,6 @@ class _ListProductState extends State<ListProduct> {
   }
 
   Widget showProgressIndicate(searchKey) {
-    print('searchKey >> $searchKey');
-
     if (searchKey == true) {
       if (filterProductAllModels.length == 0) {
         //print('aaaaa');
@@ -440,24 +461,7 @@ class _ListProductState extends State<ListProduct> {
     } else {
       return Center(child: CircularProgressIndicator());
     }
-    /*
-    return Center(
-      child:
-          statusStart ? CircularProgressIndicator() : Text('Search not found'),
-    );
-    */
   }
-
-  /*
-  Widget myLayout() {
-    return Column(
-      children: <Widget>[
-        searchForm(),
-        showProductItem(),
-      ],
-    );
-  }
-  */
 
   Widget searchForm() {
     return Container(
@@ -468,7 +472,6 @@ class _ListProductState extends State<ListProduct> {
         // trailing: IconButton(
         //     icon: Icon(Icons.search),
         //     onPressed: () {
-        //       // print('searchString ===>>> $searchString');
         //       setState(() {
         //         page = 1;
         //         productAllModels.clear();
@@ -535,10 +538,7 @@ class _ListProductState extends State<ListProduct> {
       final qrScanString = await Navigator.push(this.context,
           MaterialPageRoute(builder: (context) => ScanPreviewPage()));
 
-      print('Before scan');
       // final qrScanString = await BarcodeScanner.scan();
-      print('After scan');
-      print('scanl result: $qrScanString');
       qrString = qrScanString;
       if (qrString != null) {
         decodeQRcode(qrString);
@@ -563,24 +563,31 @@ class _ListProductState extends State<ListProduct> {
     );
   }
 
-  BottomNavigationBarItem newproductBotton(int index) {
+  BottomNavigationBarItem youritemBotton(int index) {
     return BottomNavigationBarItem(
-      icon: Icon(Icons.fiber_new),
-      label: 'New item',
+      icon: Icon(Icons.check_box_outlined),
+      label: 'Your item',
     );
   }
 
-  BottomNavigationBarItem youritemBotton(int index) {
+  BottomNavigationBarItem bestsellerBotton(int index) {
     return BottomNavigationBarItem(
-      icon: Icon(Icons.assignment_turned_in_sharp),
+      icon: Icon(Icons.star),
+      label: 'Best Seller',
+    );
+  }
+
+  BottomNavigationBarItem recommendBotton(int index) {
+    return BottomNavigationBarItem(
+      icon: Icon(Icons.thumb_up),
       label: 'Recommend',
     );
   }
 
-  BottomNavigationBarItem cartBotton() {
+  BottomNavigationBarItem newproductBotton(int index) {
     return BottomNavigationBarItem(
-      icon: Icon(Icons.shopping_cart),
-      label: 'Cart',
+      icon: Icon(Icons.fiber_new),
+      label: 'New Product',
     );
   }
 
@@ -594,14 +601,15 @@ class _ListProductState extends State<ListProduct> {
   Widget showBottomBarNav() {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
-      currentIndex: myIndex,
+      currentIndex: currentIndex, // myIndex,
       items: <BottomNavigationBarItem>[
         homeBotton(),
         productBotton(1),
-        newproductBotton(2),
-        youritemBotton(3),
-        // cartBotton(),
-        // readQrBotton(),
+        // (myIndex == 0 || myIndex == 1 || myIndex == 2)
+        youritemBotton(2),
+        bestsellerBotton(3),
+        recommendBotton(4),
+        newproductBotton(5),
       ],
       onTap: (int index) {
         print('index =$index');
@@ -614,14 +622,15 @@ class _ListProductState extends State<ListProduct> {
           );
           Navigator.of(context).pushAndRemoveUntil(route, (route) => false);
         } else if (index == 1) {
-          routeToListProduct(1);
-          // readQRcode();
+          routeToListProduct(0);
         } else if (index == 2) {
-          routeToListProduct(2);
-          // readQRcode();
+          routeToListProduct(1);
         } else if (index == 3) {
+          routeToListProduct(2);
+        } else if (index == 4) {
           routeToListProduct(3);
-          // readQRcode();
+        } else if (index == 5) {
+          routeToListProduct(4);
         }
       },
     );
@@ -632,17 +641,13 @@ class _ListProductState extends State<ListProduct> {
       String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
       http.Response response = await http.get(Uri.parse(url));
       var result = json.decode(response.body);
-      print('result ===*******>>>> $result');
 
       int status = result['status'];
-      print('status ===>>> $status');
       if (status == 0) {
         normalDialog(context, 'No Code', 'No $code in my Database');
       } else {
         var itemProducts = result['itemsProduct'];
         for (var map in itemProducts) {
-          print('map ===*******>>>> $map');
-
           ProductAllModel productAllModel = ProductAllModel.fromJson(map);
           MaterialPageRoute route = MaterialPageRoute(
             builder: (BuildContext context) => Detail(
@@ -663,19 +668,29 @@ class _ListProductState extends State<ListProduct> {
 
   @override
   Widget build(BuildContext context) {
+    String txtheader = '';
+    if (myIndex != 0) {
+      if (myIndex == 1) {
+        txtheader = 'สินค้าของคุณ';
+      } else if (myIndex == 2) {
+        txtheader = 'สินค้าขายดี';
+      } else if (myIndex == 3) {
+        txtheader = 'สินค้าแนะนำ';
+      } else if (myIndex == 4) {
+        txtheader = 'สินค้าใหม่';
+      }
+    } else {
+      txtheader = 'รายการสินค้า';
+    }
     return Scaffold(
       bottomNavigationBar: showBottomBarNav(),
       appBar: AppBar(
         backgroundColor: MyStyle().textColor,
-        title: Text('รายการสินค้า'),
+        title: Text(txtheader),
         actions: <Widget>[
           showCart(),
         ],
       ),
-      // body: filterProductAllModels.length == 0
-      //     ? showProgressIndicate()
-      //     : myLayout(),
-
       body: Column(
         children: <Widget>[
           searchForm(),
