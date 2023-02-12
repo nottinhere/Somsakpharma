@@ -1,5 +1,6 @@
+import 'dart:io' show Platform;
 import 'dart:convert';
-
+import 'dart:async';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,10 +15,9 @@ import 'package:somsakpharma/scaffold/list_product.dart';
 import 'package:somsakpharma/utility/my_style.dart';
 import 'package:somsakpharma/utility/normal_dialog.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-import 'dart:async';
-import 'dart:io' show Platform;
-import 'package:barcode_scan2/barcode_scan2.dart';
+// import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -26,6 +26,8 @@ import 'package:somsakpharma/widget/scan.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scan_preview/scan_preview_widget.dart';
 import 'package:flutter/foundation.dart';
+
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class Home extends StatefulWidget {
   final UserModel userModel;
@@ -65,6 +67,112 @@ class _HomeState extends State<Home> {
 
   _requestPermission() async {
     await Permission.camera.request();
+  }
+
+/*************************** */
+  String _scanBarcode = 'Unknown';
+
+  Future<void> startBarcodeScanStream() async {
+    FlutterBarcodeScanner.getBarcodeStreamReceiver(
+            '#ff6666', 'Cancel', true, ScanMode.BARCODE)
+        .listen((barcode) => print(barcode));
+  }
+
+  Future<void> scanQR() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.QR);
+      print(barcodeScanRes);
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _scanBarcode = barcodeScanRes;
+    });
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> scanBarcodeNormal() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+      print(barcodeScanRes);
+
+      String url =
+          'http://somsakpharma.com/api/json_product.php?bqcode=$barcodeScanRes';
+      print('barcodeScan >> $url');
+
+      http.Response response = await http.get(Uri.parse(url));
+      var result = json.decode(response.body);
+      print('result ===*******>>>> $result');
+
+      int status = result['status'];
+      print('status ===>>> $status');
+      if (status == 0) {
+        normalDialog(
+            context, 'Not found', 'ไม่พบ code :: $barcodeScanRes ในระบบ');
+      } else {
+        var itemProducts = result['itemsProduct'];
+        for (var map in itemProducts) {
+          print('map ===*******>>>> $map');
+
+          ProductAllModel productAllModel = ProductAllModel.fromJson(map);
+          MaterialPageRoute route = MaterialPageRoute(
+            builder: (BuildContext context) => Detail(
+              userModel: myUserModel,
+              productAllModel: productAllModel,
+            ),
+          );
+          Navigator.of(context).push(route).then((value) => readCart());
+
+          // Navigator.of(context).push(route).then((value) {
+          //   setState(() {
+          //     // readCart();
+          //   });
+          // });
+        }
+      }
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _scanBarcode = barcodeScanRes;
+    });
+  }
+
+/*************************** */
+
+  Future<void> readCart() async {
+    amontCart = 0;
+    String memberId = myUserModel.id.toString();
+    String url =
+        'http://somsakpharma.com/api/json_loadmycart.php?memberId=$memberId';
+
+    http.Response response = await http.get(Uri.parse(url));
+    var result = json.decode(response.body);
+    var cartList = result['cart'];
+
+    for (var map in cartList) {
+      setState(() {
+        amontCart++;
+      });
+    }
   }
 
   Future<void> readPromotion() async {
@@ -313,7 +421,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_drugs.png'),
+                  child: Image.asset('images/img_history.png'),
                   padding: EdgeInsets.all(8.0),
                 ),
                 Text(
@@ -349,7 +457,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_drugs.png'),
+                  child: Image.asset('images/img_drugs.png'),
                 ),
                 Text(
                   'รายการสินค้า',
@@ -384,7 +492,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_youritem.png'),
+                  child: Image.asset('images/img_youritem.png'),
                 ),
                 Text(
                   'สินค้าของคุณ',
@@ -419,7 +527,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_bestseller.png'),
+                  child: Image.asset('images/img_bestseller.png'),
                 ),
                 Text(
                   'สินค้าขายดี',
@@ -454,7 +562,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_recommend.png'),
+                  child: Image.asset('images/img_recommend.png'),
                 ),
                 Text(
                   'สินค้าแนะนำ',
@@ -489,7 +597,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_new.png'),
+                  child: Image.asset('images/img_new.png'),
                 ),
                 Text(
                   'สินค้าใหม่',
@@ -524,7 +632,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_cart.png'),
+                  child: Image.asset('images/img_cart.png'),
                 ),
                 Text(
                   'ตะกร้าสินค้า',
@@ -565,7 +673,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_barcode.png'),
+                  child: Image.asset('images/img_barcode.png'),
                 ),
                 Text(
                   'Barcode scan',
@@ -580,9 +688,8 @@ class _HomeState extends State<Home> {
         ),
         onTap: () {
           print('You click barcode scan');
-          // readQRcode();
-          readQRcodePreview();
-          // Navigator.of(context).pop();
+          // readQRcodePreview();
+          scanBarcodeNormal();
         },
       ),
     );
@@ -602,7 +709,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_history.png'),
+                  child: Image.asset('images/img_history.png'),
                 ),
                 Text(
                   'ประวัติการสั่ง',
@@ -642,7 +749,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_history.png'),
+                  child: Image.asset('images/img_barcode.png'),
                 ),
                 Text(
                   'scan preview',
@@ -664,7 +771,7 @@ class _HomeState extends State<Home> {
           // print('scanl result: $_result');
           print('You click scan preview');
 
-          readQRcodePreview();
+          // readQRcodePreview();
         },
       ),
     );
@@ -684,7 +791,7 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Container(
                   width: 45.0,
-                  child: Image.asset('images/icon_history.png'),
+                  child: Image.asset('images/img_barcode.png'),
                 ),
                 Text(
                   'scan',
@@ -778,88 +885,88 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget menuReadQRcode() {
-    return ListTile(
-      leading: Icon(
-        Icons.photo_camera,
-        size: 36.0,
-      ),
-      title: Text('Read QR code'),
-      subtitle: Text('Read QR code or barcode'),
-      onTap: () {
-        readQRcode();
-        Navigator.of(context).pop();
-      },
-    );
-  }
+  // Widget menuReadQRcode() {
+  //   return ListTile(
+  //     leading: Icon(
+  //       Icons.photo_camera,
+  //       size: 36.0,
+  //     ),
+  //     title: Text('Read QR code'),
+  //     subtitle: Text('Read QR code or barcode'),
+  //     onTap: () {
+  //       readQRcode();
+  //       Navigator.of(context).pop();
+  //     },
+  //   );
+  // }
 
-  Future<void> readQRcode() async {
-    try {
-      print('Before scan');
-      final qrScanString = await BarcodeScanner.scan();
-      print('After scan');
-      print('scan result = ' + qrScanString.rawContent);
-      qrString = qrScanString.rawContent;
-      if (qrString != null) {
-        decodeQRcode(qrString);
-      }
-      // setState(() => scanResult = qrScanString);
-    } on PlatformException catch (e) {
-      print('e = $e');
-    }
-  }
+  // Future<void> readQRcode() async {
+  //   try {
+  //     print('Before scan');
+  //     final qrScanString = await BarcodeScanner.scan();
+  //     print('After scan');
+  //     print('scan result = ' + qrScanString.rawContent);
+  //     qrString = qrScanString.rawContent;
+  //     if (qrString != null) {
+  //       decodeQRcode(qrString);
+  //     }
+  //     // setState(() => scanResult = qrScanString);
+  //   } on PlatformException catch (e) {
+  //     print('e = $e');
+  //   }
+  // }
 
-  Future<void> readQRcodePreview() async {
-    try {
-      final qrScanString = await Navigator.push(this.context,
-          MaterialPageRoute(builder: (context) => ScanPreviewPage()));
+  // Future<void> readQRcodePreview() async {
+  //   try {
+  //     final qrScanString = await Navigator.push(this.context,
+  //         MaterialPageRoute(builder: (context) => ScanPreviewPage()));
 
-      print('Before scan');
-      // final qrScanString = await BarcodeScanner.scan();
-      print('After scan');
-      print('scanl result: $qrScanString');
-      qrString = qrScanString;
-      if (qrString != null) {
-        decodeQRcode(qrString);
-      }
-      // setState(() => scanResult = qrScanString);
-    } on PlatformException catch (e) {
-      print('e = $e');
-    }
-  }
+  //     print('Before scan');
+  //     // final qrScanString = await BarcodeScanner.scan();
+  //     print('After scan');
+  //     print('scanl result: $qrScanString');
+  //     qrString = qrScanString;
+  //     if (qrString != null) {
+  //       decodeQRcode(qrString);
+  //     }
+  //     // setState(() => scanResult = qrScanString);
+  //   } on PlatformException catch (e) {
+  //     print('e = $e');
+  //   }
+  // }
 
-  Future<void> decodeQRcode(String code) async {
-    try {
-      String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
-      http.Response response = await http.get(Uri.parse(url));
-      var result = json.decode(response.body);
-      print('result ===*******>>>> $result');
+  // Future<void> decodeQRcode(String code) async {
+  //   try {
+  //     String url = 'http://somsakpharma.com/api/json_product.php?bqcode=$code';
+  //     http.Response response = await http.get(Uri.parse(url));
+  //     var result = json.decode(response.body);
+  //     print('result ===*******>>>> $result');
 
-      int status = result['status'];
-      print('status ===>>> $status');
-      if (status == 0) {
-        normalDialog(context, 'Not found', 'ไม่พบ code :: $code ในระบบ');
-      } else {
-        var itemProducts = result['itemsProduct'];
-        for (var map in itemProducts) {
-          print('map ===*******>>>> $map');
+  //     int status = result['status'];
+  //     print('status ===>>> $status');
+  //     if (status == 0) {
+  //       normalDialog(context, 'Not found', 'ไม่พบ code :: $code ในระบบ');
+  //     } else {
+  //       var itemProducts = result['itemsProduct'];
+  //       for (var map in itemProducts) {
+  //         print('map ===*******>>>> $map');
 
-          ProductAllModel productAllModel = ProductAllModel.fromJson(map);
-          MaterialPageRoute route = MaterialPageRoute(
-            builder: (BuildContext context) => Detail(
-              userModel: myUserModel,
-              productAllModel: productAllModel,
-            ),
-          );
-          Navigator.of(context).push(route).then((value) {
-            setState(() {
-              // readCart();
-            });
-          });
-        }
-      }
-    } catch (e) {}
-  }
+  //         ProductAllModel productAllModel = ProductAllModel.fromJson(map);
+  //         MaterialPageRoute route = MaterialPageRoute(
+  //           builder: (BuildContext context) => Detail(
+  //             userModel: myUserModel,
+  //             productAllModel: productAllModel,
+  //           ),
+  //         );
+  //         Navigator.of(context).push(route).then((value) {
+  //           setState(() {
+  //             // readCart();
+  //           });
+  //         });
+  //       }
+  //     }
+  //   } catch (e) {}
+  // }
 
   Widget homeMenu() {
     return Container(
@@ -878,6 +985,7 @@ class _HomeState extends State<Home> {
           row3Menu(),
           // scanMenu(),
           row4Menu(),
+
           // scanMenu(),
         ],
       ),
@@ -889,14 +997,15 @@ class _HomeState extends State<Home> {
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
-          headTitle('สินค้าแนะนำ', Icons.thumb_up),
-          suggest(),
+          // headTitle('สินค้าแนะนำ', Icons.thumb_up),
+          // suggest(),
+          headTitle('สินค้าโปรโมชัน', Icons.bookmark),
+          promotion(),
+
           headTitle('เมนู', Icons.home),
           homeMenu(),
           // productBox(),
           // orderhistoryBox(),
-          headTitle('สินค้าโปรโมชัน', Icons.bookmark),
-          promotion(),
         ],
       ),
     );
@@ -927,6 +1036,8 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
+/******************* WebView  ************ */
 
 class WebViewWidget extends StatefulWidget {
   WebViewWidget({Key key}) : super(key: key);
@@ -989,7 +1100,7 @@ class _WebViewState extends State<WebView> {
     String memberId = myUserModel.id;
     String memberCode = myUserModel.customerCode;
     String url =
-        'https://www.somsakpharma.com/shop/pages/tables/orderhistory_mobile.php?memberId=$memberId&memberCode=$memberCode'; //
+        'https://somsakpharma.com/shop/pages/tables/orderhistory_mobile.php?memberId=$memberId&memberCode=$memberCode'; //
     print('URL ==>> $url');
     return WebviewScaffold(
       url: url, //"https://www.androidmonks.com",
@@ -1006,15 +1117,23 @@ class _WebViewState extends State<WebView> {
   }
 }
 
+/******************* QR scan  ************ */
+
 class ScanPreviewPage extends StatefulWidget {
+  final UserModel userModel;
+
+  ScanPreviewPage({Key key, this.userModel}) : super(key: key);
   @override
   _ScanPreviewPageState createState() => _ScanPreviewPageState();
 }
 
 class _ScanPreviewPageState extends State<ScanPreviewPage> {
+  UserModel myUserModel;
+
   @override
   void initState() {
     super.initState();
+    myUserModel = widget.userModel;
   }
 
   @override

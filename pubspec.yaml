@@ -25,17 +25,18 @@ dependencies:
   cupertino_icons: ^1.0.3
   http: ^0.13.5
   carousel_slider: ^4.0.0
-  # carousel_slider: ^2.2.1
   # barcode_scan: ^3.0.1
   shared_preferences: ^2.0.15
   flutter_webview_plugin: ^0.4.0
-  flutter_spinbox: ^0.9.0
+  flutter_spinbox: ^0.12.0
   loading: ^1.0.2
   loadmore: ^2.0.1
   rflutter_alert: ^2.0.4
-  barcode_scan2: ^4.2.1
+  barcode_scan2: ^4.2.3
   permission_handler: ^10.0.0
   platform: ^3.1.0
+  webview_flutter: ^4.0.1
+  flutter_barcode_scanner: ^2.0.0
 
 
 dev_dependencies:
@@ -59,6 +60,8 @@ flutter:
   assets:
     - images/logo.png
     - images/shopping_cart.png
+    - images/icon_barcode.png
+    - images/icon_drugs.png
     - images/
 
 

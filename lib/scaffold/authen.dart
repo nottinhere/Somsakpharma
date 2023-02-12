@@ -11,7 +11,7 @@ import 'package:somsakpharma/scaffold/detail_popup.dart';
 
 import 'package:somsakpharma/utility/normal_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Authen extends StatefulWidget {
@@ -381,13 +381,13 @@ class _AuthenState extends State<Authen> {
           ),
         ),
         onTap: () {
-          print('You click order history');
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => WebView(
-                      // UserModel myUserModel,
-                      )));
+          // print('You click order history');
+          // Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //         builder: (context) => WebView(
+          //             // UserModel myUserModel,
+          //             )));
         },
       ),
     );
@@ -438,73 +438,75 @@ class _AuthenState extends State<Authen> {
     );
   }
 }
+/******************* WebView  ************ */
 
-class WebViewWidget extends StatefulWidget {
-  WebViewWidget({Key key}) : super(key: key);
+// class WebViewWidget extends StatefulWidget {
+//   WebViewWidget({Key key}) : super(key: key);
 
-  @override
-  _WebViewWidgetState createState() => _WebViewWidgetState();
-}
+//   @override
+//   _WebViewWidgetState createState() => _WebViewWidgetState();
+// }
 
-class _WebViewWidgetState extends State {
-  @override
-  void initState() {
-    super.initState();
-  }
+// class _WebViewWidgetState extends State {
+//   @override
+//   void initState() {
+//     super.initState();
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Sample WebView Widget"),
-          backgroundColor: MyStyle().bgColor,
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              Container(
-                child: TextButton(
-                    child: Text("Open my Blog"),
-                    onPressed: () {
-                      print("in");
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => WebView()));
-                    }),
-              )
-            ],
-          ),
-        ));
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//         appBar: AppBar(
+//           title: Text("Sample WebView Widget"),
+//           backgroundColor: MyStyle().bgColor,
+//         ),
+//         body: Center(
+//           child: Column(
+//             children: [
+//               Container(
+//                 child: TextButton(
+//                     child: Text("Open my Blog"),
+//                     onPressed: () {
+//                       print("in");
+//                       Navigator.push(context,
+//                           MaterialPageRoute(builder: (context) => WebView()));
+//                     }),
+//               )
+//             ],
+//           ),
+//         ));
+//   }
+// }
 
-class WebView extends StatefulWidget {
-  WebView({Key key}) : super(key: key);
+// class WebView extends StatefulWidget {
+//   WebView({Key key}) : super(key: key);
 
-  @override
-  _WebViewState createState() => _WebViewState();
-}
+//   @override
+//   _WebViewState createState() => _WebViewState();
+// }
 
-class _WebViewState extends State<WebView> {
-  @override
-  void initState() {
-    super.initState();
-  }
+// class _WebViewState extends State<WebView> {
+//   @override
+//   void initState() {
+//     super.initState();
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    String url = 'https://www.somsakpharma.com/shop/med_personal.php'; //
-    print('URL ==>> $url');
-    return WebviewScaffold(
-      url: url, //"https://www.androidmonks.com",
-      appBar: AppBar(
-        backgroundColor: MyStyle().bgColor,
-        title: Text("สมัครสมาชิก"),
-      ),
-      withZoom: true,
-      withJavascript: true,
-      withLocalStorage: true,
-      appCacheEnabled: false,
-      ignoreSSLErrors: true,
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     String url = 'https://www.somsakpharma.com/shop/med_personal.php'; //
+//     print('URL ==>> $url');
+//     return WebviewScaffold(
+//       url: url, //"https://www.androidmonks.com",
+//       appBar: AppBar(
+//         backgroundColor: MyStyle().bgColor,
+//         title: Text("สมัครสมาชิก"),
+//       ),
+//       withZoom: true,
+//       withJavascript: true,
+//       withLocalStorage: true,
+//       appCacheEnabled: false,
+//       ignoreSSLErrors: true,
+//     );
+//   }
+// }
+/******************* WebView  ************ */
